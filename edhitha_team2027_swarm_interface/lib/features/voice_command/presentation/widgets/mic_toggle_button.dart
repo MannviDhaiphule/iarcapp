@@ -50,7 +50,7 @@ class MicToggleButton extends ConsumerWidget {
           boxShadow: isListening
               ? [
                   BoxShadow(
-                    color: AppTheme.colorAccent.withOpacity(0.25),
+                    color: AppTheme.colorAccent.withValues(alpha: 0.25),
                     blurRadius: 20,
                     spreadRadius: 4,
                   ),
@@ -77,7 +77,7 @@ class MicToggleButton extends ConsumerWidget {
           )
           .shimmer(
             duration: 1200.ms,
-            color: AppTheme.colorAccent.withOpacity(0.2),
+            color: AppTheme.colorAccent.withValues(alpha: 0.2),
           );
     }
 

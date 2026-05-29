@@ -91,7 +91,7 @@ class AppTheme {
     final base = GoogleFonts.dmSansTextTheme();
     return ThemeData(
       useMaterial3: true,
-      colorScheme: ColorScheme(
+      colorScheme: const ColorScheme(
         brightness: Brightness.light,
         primary: colorAccent,
         onPrimary: Colors.white,

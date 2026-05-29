@@ -5,6 +5,8 @@ import 'package:gap/gap.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/theme/app_text_styles.dart';
 import '../providers/asr_provider.dart';
+import '../providers/intent_provider.dart';
+import '../widgets/dispatch_status_card.dart';
 import '../widgets/intent_display_card.dart';
 import '../widgets/mic_toggle_button.dart';
 import '../widgets/transcription_stream_card.dart';
@@ -66,6 +68,9 @@ class _VoiceDebugScreenState extends ConsumerState<VoiceDebugScreen> {
 
   @override
   Widget build(BuildContext context) {
+    // Activate intent → dispatch bridge
+    ref.watch(intentDispatchBridgeProvider);
+
     // React to error state changes
     ref.listen<String?>(asrErrorProvider, (_, next) {
       if (next != null && next != _lastShownError) {
@@ -102,24 +107,27 @@ class _VoiceDebugScreenState extends ConsumerState<VoiceDebugScreen> {
             ),
           ],
         ),
-        body: SafeArea(
+        body: const SafeArea(
           child: Padding(
-            padding: const EdgeInsets.symmetric(
+            padding: EdgeInsets.symmetric(
               horizontal: AppTheme.spacing16,
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                const Gap(AppTheme.spacing16),
+                Gap(AppTheme.spacing16),
                 // Intent display — top half
-                const IntentDisplayCard(),
-                const Gap(AppTheme.spacing16),
+                IntentDisplayCard(),
+                Gap(AppTheme.spacing16),
                 // Transcription stream
-                const Expanded(child: TranscriptionStreamCard()),
-                const Gap(AppTheme.spacing24),
+                Expanded(child: TranscriptionStreamCard()),
+                Gap(AppTheme.spacing16),
+                // Dispatch status card
+                DispatchStatusCard(),
+                Gap(AppTheme.spacing24),
                 // Mic toggle button centred
-                const Center(child: MicToggleButton()),
-                const Gap(AppTheme.spacing32),
+                Center(child: MicToggleButton()),
+                Gap(AppTheme.spacing32),
               ],
             ),
           ),

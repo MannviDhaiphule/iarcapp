@@ -31,7 +31,7 @@ class IntentDisplayCard extends ConsumerWidget {
         color: AppTheme.colorSurface,
         borderRadius: AppTheme.radiusCard,
         border: Border.all(
-          color: isKnown ? AppTheme.colorSuccess.withOpacity(0.4) : AppTheme.colorSurfaceDark,
+          color: isKnown ? AppTheme.colorSuccess.withValues(alpha: 0.4) : AppTheme.colorSurfaceDark,
         ),
       ),
       padding: const EdgeInsets.all(AppTheme.spacing24),
