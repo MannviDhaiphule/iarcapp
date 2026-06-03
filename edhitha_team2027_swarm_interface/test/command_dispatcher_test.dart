@@ -1,13 +1,15 @@
 import 'package:edhitha_team2027_swarm_interface/core/constants/command_ids.dart';
 import 'package:edhitha_team2027_swarm_interface/features/voice_command/data/command_dispatcher.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:http/http.dart' as http;
+import 'package:http/testing.dart';
 
 void main() {
   group('CommandDispatcher.buildPayload', () {
     late CommandDispatcher dispatcher;
 
     setUp(() {
-      dispatcher = CommandDispatcher();
+      dispatcher = CommandDispatcher(serverUrl: 'http://localhost');
     });
 
     /// Verifies all four payload fields match expectations for [id].
@@ -70,6 +72,27 @@ void main() {
           reason: 'Failed for $id',
         );
       }
+    });
+  });
+
+  group('CommandDispatcher — custom serverUrl', () {
+    test('dispatch sends POST to <serverUrl>/cmd', () async {
+      Uri? capturedUri;
+      final mockClient = MockClient((request) async {
+        capturedUri = request.url;
+        return http.Response('', 200);
+      });
+
+      final dispatcher = CommandDispatcher(
+        serverUrl: 'http://10.0.0.1:9090',
+        client: mockClient,
+      );
+
+      final result = await dispatcher.dispatch(CommandId.cmdLaunch);
+
+      expect(result, isTrue);
+      expect(capturedUri, isNotNull);
+      expect(capturedUri.toString(), equals('http://10.0.0.1:9090/cmd'));
     });
   });
 }

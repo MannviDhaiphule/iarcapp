@@ -18,6 +18,10 @@ final intentProvider = Provider<CommandId>((ref) {
 final intentDispatchBridgeProvider = Provider<void>((ref) {
   ref.listen<CommandId>(intentProvider, (_, next) {
     ref.read(dispatchProvider.notifier).onIntentChanged(next);
+    // Auto mic off — stop listening the moment a valid command is recognised.
+    if (next != CommandId.unknown) {
+      ref.read(asrProvider.notifier).stopListeningOnCommand();
+    }
   });
 });
 

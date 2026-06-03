@@ -1,0 +1,241 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_animate/flutter_animate.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:gap/gap.dart';
+
+import '../../../../core/constants/app_constants.dart';
+import '../../../../core/theme/app_text_styles.dart';
+import '../../../../core/theme/app_theme.dart';
+import '../providers/settings_provider.dart';
+
+/// Screen that allows the user to configure the drone server IP and port.
+class SettingsScreen extends ConsumerStatefulWidget {
+  /// Creates a [SettingsScreen].
+  const SettingsScreen({super.key});
+
+  @override
+  ConsumerState<SettingsScreen> createState() => _SettingsScreenState();
+}
+
+class _SettingsScreenState extends ConsumerState<SettingsScreen> {
+  final TextEditingController _ipController = TextEditingController();
+  final TextEditingController _portController = TextEditingController();
+  bool _initialized = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _ipController.addListener(() => setState(() {}));
+    _portController.addListener(() => setState(() {}));
+  }
+
+  @override
+  void dispose() {
+    _ipController.dispose();
+    _portController.dispose();
+    super.dispose();
+  }
+
+  /// Live preview URL derived from the current text-field values.
+  String get _previewUrl {
+    final ip = _ipController.text.trim().isEmpty
+        ? AppConstants.defaultServerIp
+        : _ipController.text.trim();
+    final port =
+        int.tryParse(_portController.text.trim()) ?? AppConstants.defaultServerPort;
+    return 'http://$ip:$port';
+  }
+
+  void _save() {
+    final port = int.tryParse(_portController.text.trim());
+    if (port == null) return;
+    ref.read(settingsProvider.notifier).updateServerIp(_ipController.text.trim());
+    ref.read(settingsProvider.notifier).updateServerPort(port);
+  }
+
+  void _reset() {
+    ref.read(settingsProvider.notifier).resetToDefaults();
+    _ipController.text = AppConstants.defaultServerIp;
+    _portController.text = AppConstants.defaultServerPort.toString();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final settingsAsync = ref.watch(settingsProvider);
+
+    // Pre-fill controllers once settings have loaded.
+    settingsAsync.whenData((s) {
+      if (!_initialized) {
+        _initialized = true;
+        _ipController.text = s.serverIp;
+        _portController.text = s.serverPort.toString();
+      }
+    });
+
+    final settings = settingsAsync.valueOrNull;
+    final isSaving = settings?.isSaving ?? false;
+    final savedSuccess = settings?.savedSuccess ?? false;
+    final error = settings?.error;
+
+    return Scaffold(
+      backgroundColor: AppTheme.colorBackground,
+      appBar: AppBar(
+        backgroundColor: AppTheme.colorBackground,
+        elevation: 0,
+        scrolledUnderElevation: 0,
+        title: Text('SETTINGS', style: AppTextStyles.appBarTitle),
+      ),
+      body: SafeArea(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.all(AppTheme.spacing16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              const Gap(AppTheme.spacing16),
+
+              // ── Server configuration card ───────────────────────────────
+              Container(
+                decoration: BoxDecoration(
+                  color: AppTheme.colorSurface,
+                  borderRadius: AppTheme.radiusCard,
+                  border: Border.all(color: AppTheme.colorSurfaceDark),
+                ),
+                padding: const EdgeInsets.all(AppTheme.spacing16),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text('SERVER CONFIGURATION', style: AppTextStyles.cardTitle),
+                    const Gap(AppTheme.spacing16),
+
+                    // IP field
+                    Text(
+                      'Server IP Address',
+                      style: AppTextStyles.transcriptBody.copyWith(
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    const Gap(AppTheme.spacing8),
+                    TextField(
+                      controller: _ipController,
+                      keyboardType: const TextInputType.numberWithOptions(
+                        decimal: true,
+                      ),
+                      style: AppTextStyles.transcriptBody,
+                      decoration: InputDecoration(
+                        hintText: AppConstants.defaultServerIp,
+                        filled: true,
+                        fillColor: AppTheme.colorBackground,
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        errorText: error,
+                        errorStyle: const TextStyle(color: AppTheme.colorError),
+                      ),
+                    ),
+                    const Gap(AppTheme.spacing12),
+
+                    // Port field
+                    Text(
+                      'Port',
+                      style: AppTextStyles.transcriptBody.copyWith(
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    const Gap(AppTheme.spacing8),
+                    TextField(
+                      controller: _portController,
+                      keyboardType: TextInputType.number,
+                      style: AppTextStyles.transcriptBody,
+                      decoration: InputDecoration(
+                        hintText: AppConstants.defaultServerPort.toString(),
+                        filled: true,
+                        fillColor: AppTheme.colorBackground,
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                      ),
+                    ),
+                    const Gap(AppTheme.spacing16),
+
+                    // Buttons
+                    Row(
+                      children: [
+                        Expanded(
+                          child: FilledButton(
+                            onPressed: isSaving ? null : _save,
+                            style: FilledButton.styleFrom(
+                              backgroundColor: AppTheme.colorAccent,
+                              disabledBackgroundColor:
+                                  AppTheme.colorSurfaceDark,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                            ),
+                            child: const Text('SAVE'),
+                          ),
+                        ),
+                        const Gap(AppTheme.spacing12),
+                        Expanded(
+                          child: OutlinedButton(
+                            onPressed: _reset,
+                            style: OutlinedButton.styleFrom(
+                              side: const BorderSide(
+                                color: AppTheme.colorAccent,
+                              ),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                            ),
+                            child: const Text('RESET TO DEFAULT'),
+                          ),
+                        ),
+                      ],
+                    ),
+
+                    // Saved banner
+                    if (savedSuccess) ...[
+                      const Gap(AppTheme.spacing8),
+                      Text(
+                        '✓ Saved!',
+                        style: AppTextStyles.transcriptBody.copyWith(
+                          color: AppTheme.colorSuccess,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ).animate().fadeIn(duration: 200.ms),
+                    ],
+                  ],
+                ),
+              ),
+
+              const Gap(AppTheme.spacing16),
+
+              // ── Live URL preview card ───────────────────────────────────
+              Container(
+                decoration: BoxDecoration(
+                  color: AppTheme.colorSurface,
+                  borderRadius: AppTheme.radiusCard,
+                  border: Border.all(color: AppTheme.colorSurfaceDark),
+                ),
+                padding: const EdgeInsets.all(AppTheme.spacing16),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text('CURRENT SERVER URL', style: AppTextStyles.cardTitle),
+                    const Gap(AppTheme.spacing8),
+                    Text(
+                      _previewUrl,
+                      style: AppTextStyles.transcriptBody.copyWith(
+                        color: AppTheme.colorAccent,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}

@@ -3,8 +3,10 @@ import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../../core/constants/app_constants.dart';
 import '../../../../core/constants/command_ids.dart';
 import '../../data/command_dispatcher.dart';
+import '../../../../features/settings/presentation/providers/settings_provider.dart';
 
 /// Immutable state for the HTTP dispatch feature.
 @immutable
@@ -40,10 +42,10 @@ class DispatchState {
 
 /// Notifier that owns [DispatchState] and drives HTTP command dispatch.
 class DispatchNotifier extends StateNotifier<DispatchState> {
-  /// Creates a [DispatchNotifier] with a fresh [CommandDispatcher].
-  DispatchNotifier() : super(const DispatchState());
+  /// Creates a [DispatchNotifier] with access to [Ref] for settings lookup.
+  DispatchNotifier(this._ref) : super(const DispatchState());
 
-  final CommandDispatcher _dispatcher = CommandDispatcher();
+  final Ref _ref;
   Timer? _debounceTimer;
   Timer? _resetTimer;
 
@@ -112,9 +114,15 @@ class DispatchNotifier extends StateNotifier<DispatchState> {
     });
   }
 
-  /// Fires the HTTP POST after the debounce delay.
+  /// Fires the HTTP POST after the debounce delay using the current server URL.
   Future<void> _fire(CommandId command) async {
     if (!mounted) return;
+
+    // Read the server URL at dispatch time so changes in Settings are picked up.
+    final serverUrl =
+        _ref.read(settingsProvider).valueOrNull?.serverUrl ??
+        AppConstants.defaultServerUrl;
+    final dispatcher = CommandDispatcher(serverUrl: serverUrl);
 
     state = DispatchState(
       lastDispatched: state.lastDispatched,
@@ -126,7 +134,7 @@ class DispatchNotifier extends StateNotifier<DispatchState> {
     );
 
     try {
-      final success = await _dispatcher.dispatch(command);
+      final success = await dispatcher.dispatch(command);
       if (!mounted) return;
 
       if (!success) {
@@ -172,5 +180,5 @@ class DispatchNotifier extends StateNotifier<DispatchState> {
 /// Use `ref.read(dispatchProvider.notifier).cancelPending()` to cancel.
 final dispatchProvider =
     StateNotifierProvider<DispatchNotifier, DispatchState>(
-  (ref) => DispatchNotifier(),
+  (ref) => DispatchNotifier(ref),
 );

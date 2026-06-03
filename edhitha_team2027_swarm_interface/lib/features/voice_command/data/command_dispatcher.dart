@@ -7,25 +7,30 @@ import '../../../../core/constants/command_ids.dart';
 
 /// Sends drone commands to the swarm HTTP server via HTTP POST.
 class CommandDispatcher {
-  static const String _baseUrl = 'http://192.168.50.1:8080';
-
-  /// POSTs [command] to the swarm server endpoint `/cmd`.
+  /// Creates a [CommandDispatcher] targeting [serverUrl].
   ///
-  /// Returns `true` when the server responds with HTTP 200.
-  /// Returns `false` on non-200 responses (logged via the caller).
+  /// Supply an optional [client] for dependency injection in tests.
+  CommandDispatcher({required String serverUrl, http.Client? client})
+      : _serverUrl = serverUrl,
+        _client = client ?? http.Client();
+
+  final String _serverUrl;
+  final http.Client _client;
+
+  /// POSTs [command] to `<serverUrl>/cmd`.
+  ///
+  /// Returns `true` on HTTP 200, `false` on non-200.
   /// Throws [CommandDispatchException] if the network is unreachable.
   Future<bool> dispatch(CommandId command) async {
-    final uri = Uri.parse('$_baseUrl/cmd');
+    final uri = Uri.parse('$_serverUrl/cmd');
     final body = jsonEncode(buildPayload(command));
     try {
-      final response = await http.post(
+      final response = await _client.post(
         uri,
         headers: {'Content-Type': 'application/json'},
         body: body,
       );
-      if (response.statusCode == 200) {
-        return true;
-      }
+      if (response.statusCode == 200) return true;
       return false;
     } on SocketException catch (e) {
       throw CommandDispatchException('Network unreachable: $e');

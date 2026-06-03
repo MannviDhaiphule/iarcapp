@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+
 import 'core/theme/app_theme.dart';
+import 'features/settings/presentation/screens/settings_screen.dart';
 import 'features/voice_command/presentation/screens/voice_debug_screen.dart';
 
 /// Root application widget.
@@ -16,7 +17,11 @@ class SwarmApp extends StatelessWidget {
       title: 'Swarm Interface',
       debugShowCheckedModeBanner: false,
       theme: AppTheme.themeData,
-      home: const VoiceDebugScreen(),
+      initialRoute: '/',
+      routes: {
+        '/': (_) => const VoiceDebugScreen(),
+        '/settings': (_) => const SettingsScreen(),
+      },
     );
   }
 }

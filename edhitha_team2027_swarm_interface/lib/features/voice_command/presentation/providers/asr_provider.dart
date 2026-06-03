@@ -111,6 +111,15 @@ class AsrNotifier extends StateNotifier<AsrState> {
     }
   }
 
+  /// Stops the microphone immediately when a valid command is recognised.
+  ///
+  /// No-op if the service is already idle.
+  Future<void> stopListeningOnCommand() async {
+    if (!state.isListening) return;
+    await _service.stopListening();
+    state = state.copyWith(isListening: false);
+  }
+
   @override
   void dispose() {
     _service.dispose();
