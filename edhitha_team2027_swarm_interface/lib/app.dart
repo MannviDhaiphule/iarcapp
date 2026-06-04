@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 
 import 'core/theme/app_theme.dart';
+import 'features/commands/presentation/screens/commands_screen.dart';
+import 'features/map/presentation/screens/map_screen.dart';
 import 'features/settings/presentation/screens/settings_screen.dart';
 import 'features/voice_command/presentation/screens/voice_debug_screen.dart';
 
@@ -21,6 +23,8 @@ class SwarmApp extends StatelessWidget {
       routes: {
         '/': (_) => const VoiceDebugScreen(),
         '/settings': (_) => const SettingsScreen(),
+        '/commands': (_) => const CommandsScreen(),
+        '/map': (_) => const MapScreen(),
       },
     );
   }

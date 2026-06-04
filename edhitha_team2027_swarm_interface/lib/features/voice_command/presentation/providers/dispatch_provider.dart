@@ -78,6 +78,7 @@ class DispatchNotifier extends StateNotifier<DispatchState> {
       cancelled: false,
     );
 
+    debugPrint('[SwarmApp] onIntentChanged: ${intent.label}');
     _debounceTimer = Timer(
       const Duration(seconds: 5),
       () => _fire(intent),
@@ -116,12 +117,14 @@ class DispatchNotifier extends StateNotifier<DispatchState> {
 
   /// Fires the HTTP POST after the debounce delay using the current server URL.
   Future<void> _fire(CommandId command) async {
+    debugPrint('[SwarmApp] _fire called for ${command.label}');
     if (!mounted) return;
 
     // Read the server URL at dispatch time so changes in Settings are picked up.
     final serverUrl =
         _ref.read(settingsProvider).valueOrNull?.serverUrl ??
         AppConstants.defaultServerUrl;
+    debugPrint('[SwarmApp] Server URL: $serverUrl');
     final dispatcher = CommandDispatcher(serverUrl: serverUrl);
 
     state = DispatchState(

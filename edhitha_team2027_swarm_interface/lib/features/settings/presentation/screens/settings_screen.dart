@@ -8,7 +8,7 @@ import '../../../../core/theme/app_text_styles.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../providers/settings_provider.dart';
 
-/// Screen that allows the user to configure the drone server IP and port.
+/// Screen that allows the user to configure server and map URLs.
 class SettingsScreen extends ConsumerStatefulWidget {
   /// Creates a [SettingsScreen].
   const SettingsScreen({super.key});
@@ -20,6 +20,8 @@ class SettingsScreen extends ConsumerStatefulWidget {
 class _SettingsScreenState extends ConsumerState<SettingsScreen> {
   final TextEditingController _ipController = TextEditingController();
   final TextEditingController _portController = TextEditingController();
+  final TextEditingController _mapUrlController = TextEditingController();
+  final TextEditingController _pathUrlController = TextEditingController();
   bool _initialized = false;
 
   @override
@@ -27,12 +29,16 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     super.initState();
     _ipController.addListener(() => setState(() {}));
     _portController.addListener(() => setState(() {}));
+    _mapUrlController.addListener(() => setState(() {}));
+    _pathUrlController.addListener(() => setState(() {}));
   }
 
   @override
   void dispose() {
     _ipController.dispose();
     _portController.dispose();
+    _mapUrlController.dispose();
+    _pathUrlController.dispose();
     super.dispose();
   }
 
@@ -46,17 +52,35 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     return 'http://$ip:$port';
   }
 
-  void _save() {
+  void _saveServer() {
     final port = int.tryParse(_portController.text.trim());
     if (port == null) return;
     ref.read(settingsProvider.notifier).updateServerIp(_ipController.text.trim());
     ref.read(settingsProvider.notifier).updateServerPort(port);
   }
 
-  void _reset() {
+  void _resetServer() {
     ref.read(settingsProvider.notifier).resetToDefaults();
     _ipController.text = AppConstants.defaultServerIp;
     _portController.text = AppConstants.defaultServerPort.toString();
+    _mapUrlController.text = AppConstants.defaultMapImageUrl;
+    _pathUrlController.text = AppConstants.defaultPathTextUrl;
+  }
+
+  void _saveMap() {
+    ref
+        .read(settingsProvider.notifier)
+        .updateMapImageUrl(_mapUrlController.text.trim());
+    ref
+        .read(settingsProvider.notifier)
+        .updatePathTextUrl(_pathUrlController.text.trim());
+  }
+
+  void _resetMap() {
+    ref.read(settingsProvider.notifier).updateMapImageUrl(AppConstants.defaultMapImageUrl);
+    ref.read(settingsProvider.notifier).updatePathTextUrl(AppConstants.defaultPathTextUrl);
+    _mapUrlController.text = AppConstants.defaultMapImageUrl;
+    _pathUrlController.text = AppConstants.defaultPathTextUrl;
   }
 
   @override
@@ -69,6 +93,8 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
         _initialized = true;
         _ipController.text = s.serverIp;
         _portController.text = s.serverPort.toString();
+        _mapUrlController.text = s.mapImageUrl;
+        _pathUrlController.text = s.pathTextUrl;
       }
     });
 
@@ -93,149 +119,181 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
             children: [
               const Gap(AppTheme.spacing16),
 
-              // ── Server configuration card ───────────────────────────────
-              Container(
-                decoration: BoxDecoration(
-                  color: AppTheme.colorSurface,
-                  borderRadius: AppTheme.radiusCard,
-                  border: Border.all(color: AppTheme.colorSurfaceDark),
-                ),
-                padding: const EdgeInsets.all(AppTheme.spacing16),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text('SERVER CONFIGURATION', style: AppTextStyles.cardTitle),
-                    const Gap(AppTheme.spacing16),
-
-                    // IP field
+              // ── Server configuration card ─────────────────────────────
+              _buildCard(
+                title: 'SERVER CONFIGURATION',
+                children: [
+                  _buildLabel('Server IP Address'),
+                  const Gap(AppTheme.spacing8),
+                  TextField(
+                    controller: _ipController,
+                    keyboardType: const TextInputType.numberWithOptions(
+                      decimal: true,
+                    ),
+                    style: AppTextStyles.transcriptBody,
+                    decoration: InputDecoration(
+                      hintText: AppConstants.defaultServerIp,
+                      filled: true,
+                      fillColor: AppTheme.colorBackground,
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      errorText: error,
+                      errorStyle: const TextStyle(color: AppTheme.colorError),
+                    ),
+                  ),
+                  const Gap(AppTheme.spacing12),
+                  _buildLabel('Port'),
+                  const Gap(AppTheme.spacing8),
+                  TextField(
+                    controller: _portController,
+                    keyboardType: TextInputType.number,
+                    style: AppTextStyles.transcriptBody,
+                    decoration: InputDecoration(
+                      hintText: AppConstants.defaultServerPort.toString(),
+                      filled: true,
+                      fillColor: AppTheme.colorBackground,
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                    ),
+                  ),
+                  const Gap(AppTheme.spacing16),
+                  _buildButtons(onSave: isSaving ? null : _saveServer, onReset: _resetServer),
+                  if (savedSuccess) ...[
+                    const Gap(AppTheme.spacing8),
                     Text(
-                      'Server IP Address',
+                      '✓ Saved!',
                       style: AppTextStyles.transcriptBody.copyWith(
+                        color: AppTheme.colorSuccess,
                         fontWeight: FontWeight.w600,
                       ),
-                    ),
-                    const Gap(AppTheme.spacing8),
-                    TextField(
-                      controller: _ipController,
-                      keyboardType: const TextInputType.numberWithOptions(
-                        decimal: true,
-                      ),
-                      style: AppTextStyles.transcriptBody,
-                      decoration: InputDecoration(
-                        hintText: AppConstants.defaultServerIp,
-                        filled: true,
-                        fillColor: AppTheme.colorBackground,
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        errorText: error,
-                        errorStyle: const TextStyle(color: AppTheme.colorError),
-                      ),
-                    ),
-                    const Gap(AppTheme.spacing12),
-
-                    // Port field
-                    Text(
-                      'Port',
-                      style: AppTextStyles.transcriptBody.copyWith(
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                    const Gap(AppTheme.spacing8),
-                    TextField(
-                      controller: _portController,
-                      keyboardType: TextInputType.number,
-                      style: AppTextStyles.transcriptBody,
-                      decoration: InputDecoration(
-                        hintText: AppConstants.defaultServerPort.toString(),
-                        filled: true,
-                        fillColor: AppTheme.colorBackground,
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                      ),
-                    ),
-                    const Gap(AppTheme.spacing16),
-
-                    // Buttons
-                    Row(
-                      children: [
-                        Expanded(
-                          child: FilledButton(
-                            onPressed: isSaving ? null : _save,
-                            style: FilledButton.styleFrom(
-                              backgroundColor: AppTheme.colorAccent,
-                              disabledBackgroundColor:
-                                  AppTheme.colorSurfaceDark,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(12),
-                              ),
-                            ),
-                            child: const Text('SAVE'),
-                          ),
-                        ),
-                        const Gap(AppTheme.spacing12),
-                        Expanded(
-                          child: OutlinedButton(
-                            onPressed: _reset,
-                            style: OutlinedButton.styleFrom(
-                              side: const BorderSide(
-                                color: AppTheme.colorAccent,
-                              ),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(12),
-                              ),
-                            ),
-                            child: const Text('RESET TO DEFAULT'),
-                          ),
-                        ),
-                      ],
-                    ),
-
-                    // Saved banner
-                    if (savedSuccess) ...[
-                      const Gap(AppTheme.spacing8),
-                      Text(
-                        '✓ Saved!',
-                        style: AppTextStyles.transcriptBody.copyWith(
-                          color: AppTheme.colorSuccess,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ).animate().fadeIn(duration: 200.ms),
-                    ],
+                    ).animate().fadeIn(duration: 200.ms),
                   ],
-                ),
+                ],
               ),
-
               const Gap(AppTheme.spacing16),
 
-              // ── Live URL preview card ───────────────────────────────────
-              Container(
-                decoration: BoxDecoration(
-                  color: AppTheme.colorSurface,
-                  borderRadius: AppTheme.radiusCard,
-                  border: Border.all(color: AppTheme.colorSurfaceDark),
-                ),
-                padding: const EdgeInsets.all(AppTheme.spacing16),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text('CURRENT SERVER URL', style: AppTextStyles.cardTitle),
-                    const Gap(AppTheme.spacing8),
-                    Text(
-                      _previewUrl,
-                      style: AppTextStyles.transcriptBody.copyWith(
-                        color: AppTheme.colorAccent,
-                        fontWeight: FontWeight.w500,
+              // ── Live URL preview card ─────────────────────────────────
+              _buildCard(
+                title: 'CURRENT SERVER URL',
+                children: [
+                  Text(
+                    _previewUrl,
+                    style: AppTextStyles.transcriptBody.copyWith(
+                      color: AppTheme.colorAccent,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ],
+              ),
+              const Gap(AppTheme.spacing16),
+
+              // ── Map configuration card ────────────────────────────────
+              _buildCard(
+                title: 'MAP CONFIGURATION',
+                children: [
+                  _buildLabel('Map Image URL'),
+                  const Gap(AppTheme.spacing8),
+                  TextField(
+                    controller: _mapUrlController,
+                    keyboardType: TextInputType.url,
+                    style: AppTextStyles.transcriptBody,
+                    decoration: InputDecoration(
+                      hintText: AppConstants.defaultMapImageUrl,
+                      filled: true,
+                      fillColor: AppTheme.colorBackground,
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(8),
                       ),
                     ),
-                  ],
-                ),
+                  ),
+                  const Gap(AppTheme.spacing12),
+                  _buildLabel('Path Text URL'),
+                  const Gap(AppTheme.spacing8),
+                  TextField(
+                    controller: _pathUrlController,
+                    keyboardType: TextInputType.url,
+                    style: AppTextStyles.transcriptBody,
+                    decoration: InputDecoration(
+                      hintText: AppConstants.defaultPathTextUrl,
+                      filled: true,
+                      fillColor: AppTheme.colorBackground,
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                    ),
+                  ),
+                  const Gap(AppTheme.spacing16),
+                  _buildButtons(onSave: isSaving ? null : _saveMap, onReset: _resetMap),
+                ],
               ),
             ],
           ),
         ),
       ),
+    );
+  }
+
+  /// Builds a standard card container with [title] header.
+  Widget _buildCard({required String title, required List<Widget> children}) {
+    return Container(
+      decoration: BoxDecoration(
+        color: AppTheme.colorSurface,
+        borderRadius: AppTheme.radiusCard,
+        border: Border.all(color: AppTheme.colorSurfaceDark),
+      ),
+      padding: const EdgeInsets.all(AppTheme.spacing16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(title, style: AppTextStyles.cardTitle),
+          const Gap(AppTheme.spacing16),
+          ...children,
+        ],
+      ),
+    );
+  }
+
+  /// Builds a bold field label.
+  Widget _buildLabel(String text) {
+    return Text(
+      text,
+      style: AppTextStyles.transcriptBody.copyWith(fontWeight: FontWeight.w600),
+    );
+  }
+
+  /// Builds the SAVE / RESET TO DEFAULT button row.
+  Widget _buildButtons({VoidCallback? onSave, required VoidCallback onReset}) {
+    return Row(
+      children: [
+        Expanded(
+          child: FilledButton(
+            onPressed: onSave,
+            style: FilledButton.styleFrom(
+              backgroundColor: AppTheme.colorAccent,
+              disabledBackgroundColor: AppTheme.colorSurfaceDark,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+            ),
+            child: const Text('SAVE'),
+          ),
+        ),
+        const Gap(AppTheme.spacing12),
+        Expanded(
+          child: OutlinedButton(
+            onPressed: onReset,
+            style: OutlinedButton.styleFrom(
+              side: const BorderSide(color: AppTheme.colorAccent),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+            ),
+            child: const Text('RESET TO DEFAULT'),
+          ),
+        ),
+      ],
     );
   }
 }

@@ -11,4 +11,10 @@ class AppConstants {
   /// Full default server base URL derived from [defaultServerIp] and [defaultServerPort].
   static const String defaultServerUrl =
       'http://$defaultServerIp:$defaultServerPort';
+
+  /// Default URL for the live PNG map image endpoint.
+  static const String defaultMapImageUrl = 'http://192.168.50.1:8080/map';
+
+  /// Default URL for the path text endpoint.
+  static const String defaultPathTextUrl = 'http://192.168.50.1:8080/path';
 }

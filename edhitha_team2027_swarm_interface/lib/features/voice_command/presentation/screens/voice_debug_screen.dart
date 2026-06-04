@@ -131,6 +131,38 @@ class _VoiceDebugScreenState extends ConsumerState<VoiceDebugScreen> {
                   Navigator.pushNamed(context, '/settings');
                 },
               ),
+              ListTile(
+                leading: const Icon(
+                  Icons.gamepad,
+                  color: AppTheme.colorAccent,
+                ),
+                title: Text(
+                  'Commands',
+                  style: AppTextStyles.transcriptBody.copyWith(
+                    color: AppTheme.colorTextPrimary,
+                  ),
+                ),
+                onTap: () {
+                  Navigator.pop(context);
+                  Navigator.pushNamed(context, '/commands');
+                },
+              ),
+              ListTile(
+                leading: const Icon(
+                  Icons.map,
+                  color: AppTheme.colorAccent,
+                ),
+                title: Text(
+                  'Map',
+                  style: AppTextStyles.transcriptBody.copyWith(
+                    color: AppTheme.colorTextPrimary,
+                  ),
+                ),
+                onTap: () {
+                  Navigator.pop(context);
+                  Navigator.pushNamed(context, '/map');
+                },
+              ),
               // Space reserved for future drawer items.
             ],
           ),

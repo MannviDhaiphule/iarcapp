@@ -22,6 +22,8 @@ class SettingsState {
   const SettingsState({
     required this.serverIp,
     required this.serverPort,
+    this.mapImageUrl = AppConstants.defaultMapImageUrl,
+    this.pathTextUrl = AppConstants.defaultPathTextUrl,
     this.isSaving = false,
     this.savedSuccess = false,
     this.error,
@@ -33,13 +35,19 @@ class SettingsState {
   /// The configured server port number.
   final int serverPort;
 
+  /// The configured map image URL.
+  final String mapImageUrl;
+
+  /// The configured path text URL.
+  final String pathTextUrl;
+
   /// Whether a save operation is currently in progress.
   final bool isSaving;
 
   /// Briefly `true` after a successful save — resets to `false` after 2 seconds.
   final bool savedSuccess;
 
-  /// Set when IP validation fails; `null` otherwise.
+  /// Set when validation fails; `null` otherwise.
   final String? error;
 
   /// Full base URL derived from [serverIp] and [serverPort].
@@ -49,6 +57,8 @@ class SettingsState {
   SettingsState copyWith({
     String? serverIp,
     int? serverPort,
+    String? mapImageUrl,
+    String? pathTextUrl,
     bool? isSaving,
     bool? savedSuccess,
     Object? error = _unset,
@@ -56,6 +66,8 @@ class SettingsState {
     return SettingsState(
       serverIp: serverIp ?? this.serverIp,
       serverPort: serverPort ?? this.serverPort,
+      mapImageUrl: mapImageUrl ?? this.mapImageUrl,
+      pathTextUrl: pathTextUrl ?? this.pathTextUrl,
       isSaving: isSaving ?? this.isSaving,
       savedSuccess: savedSuccess ?? this.savedSuccess,
       error: identical(error, _unset) ? this.error : error as String?,
@@ -73,7 +85,14 @@ class Settings extends _$Settings {
   Future<SettingsState> build() async {
     final ip = await _repo.getServerIp();
     final port = await _repo.getServerPort();
-    return SettingsState(serverIp: ip, serverPort: port);
+    final mapUrl = await _repo.getMapImageUrl();
+    final pathUrl = await _repo.getPathTextUrl();
+    return SettingsState(
+      serverIp: ip,
+      serverPort: port,
+      mapImageUrl: mapUrl,
+      pathTextUrl: pathUrl,
+    );
   }
 
   /// Validates [ip] format and saves it; sets [SettingsState.error] if invalid.
@@ -121,14 +140,58 @@ class Settings extends _$Settings {
     _scheduleSavedReset();
   }
 
-  /// Resets both IP and port to [AppConstants] defaults and persists.
+  /// Validates [url] starts with http:// or https:// and saves as map image URL.
+  Future<void> updateMapImageUrl(String url) async {
+    final current = _current();
+    if (!url.startsWith('http://') && !url.startsWith('https://')) {
+      state = AsyncData(current.copyWith(error: 'URL must start with http:// or https://'));
+      return;
+    }
+    state = AsyncData(current.copyWith(isSaving: true, error: null));
+    await _repo.setMapImageUrl(url);
+    state = AsyncData(
+      current.copyWith(
+        mapImageUrl: url,
+        isSaving: false,
+        savedSuccess: true,
+        error: null,
+      ),
+    );
+    _scheduleSavedReset();
+  }
+
+  /// Validates [url] starts with http:// or https:// and saves as path text URL.
+  Future<void> updatePathTextUrl(String url) async {
+    final current = _current();
+    if (!url.startsWith('http://') && !url.startsWith('https://')) {
+      state = AsyncData(current.copyWith(error: 'URL must start with http:// or https://'));
+      return;
+    }
+    state = AsyncData(current.copyWith(isSaving: true, error: null));
+    await _repo.setPathTextUrl(url);
+    state = AsyncData(
+      current.copyWith(
+        pathTextUrl: url,
+        isSaving: false,
+        savedSuccess: true,
+        error: null,
+      ),
+    );
+    _scheduleSavedReset();
+  }
+
+  /// Resets all values to [AppConstants] defaults and persists.
   Future<void> resetToDefaults() async {
     await _repo.setServerIp(AppConstants.defaultServerIp);
     await _repo.setServerPort(AppConstants.defaultServerPort);
+    await _repo.setMapImageUrl(AppConstants.defaultMapImageUrl);
+    await _repo.setPathTextUrl(AppConstants.defaultPathTextUrl);
     state = const AsyncData(
       SettingsState(
         serverIp: AppConstants.defaultServerIp,
         serverPort: AppConstants.defaultServerPort,
+        mapImageUrl: AppConstants.defaultMapImageUrl,
+        pathTextUrl: AppConstants.defaultPathTextUrl,
         savedSuccess: true,
       ),
     );

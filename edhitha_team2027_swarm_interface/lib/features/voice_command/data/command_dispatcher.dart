@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 
 import '../../../../core/constants/command_ids.dart';
@@ -25,6 +26,8 @@ class CommandDispatcher {
     final uri = Uri.parse('$_serverUrl/cmd');
     final body = jsonEncode(buildPayload(command));
     try {
+      debugPrint('[SwarmApp] POST $uri');
+      debugPrint('[SwarmApp] BODY $body');
       final response = await _client.post(
         uri,
         headers: {'Content-Type': 'application/json'},

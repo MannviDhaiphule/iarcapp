@@ -37,4 +37,31 @@ class SettingsRepository {
     final port = await getServerPort();
     return 'http://$ip:$port';
   }
+
+  static const String _keyMapImageUrl = 'map_image_url';
+  static const String _keyPathTextUrl = 'path_text_url';
+
+  /// Returns the saved map image URL, or [AppConstants.defaultMapImageUrl] if not set.
+  Future<String> getMapImageUrl() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getString(_keyMapImageUrl) ?? AppConstants.defaultMapImageUrl;
+  }
+
+  /// Returns the saved path text URL, or [AppConstants.defaultPathTextUrl] if not set.
+  Future<String> getPathTextUrl() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getString(_keyPathTextUrl) ?? AppConstants.defaultPathTextUrl;
+  }
+
+  /// Saves [url] as the map image URL.
+  Future<void> setMapImageUrl(String url) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString(_keyMapImageUrl, url);
+  }
+
+  /// Saves [url] as the path text URL.
+  Future<void> setPathTextUrl(String url) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString(_keyPathTextUrl, url);
+  }
 }
