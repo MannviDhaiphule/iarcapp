@@ -24,4 +24,3 @@ final intentDispatchBridgeProvider = Provider<void>((ref) {
     }
   });
 });
-

@@ -3,7 +3,6 @@ import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../../../core/constants/app_constants.dart';
 import '../../../../core/constants/command_ids.dart';
 import '../../data/command_dispatcher.dart';
 import '../../../../features/settings/presentation/providers/settings_provider.dart';
@@ -120,11 +119,12 @@ class DispatchNotifier extends StateNotifier<DispatchState> {
     debugPrint('[SwarmApp] _fire called for ${command.label}');
     if (!mounted) return;
 
-    // Read the server URL at dispatch time so changes in Settings are picked up.
-    final serverUrl =
-        _ref.read(settingsProvider).valueOrNull?.serverUrl ??
-        AppConstants.defaultServerUrl;
-    debugPrint('[SwarmApp] Server URL: $serverUrl');
+    final settingsAsync = _ref.read(settingsProvider);
+    if (settingsAsync.isLoading) {
+      await _ref.read(settingsProvider.future);
+    }
+    final serverUrl = _ref.read(settingsProvider).requireValue.serverUrl;
+    debugPrint('[SwarmApp] Dispatching to: $serverUrl');
     final dispatcher = CommandDispatcher(serverUrl: serverUrl);
 
     state = DispatchState(
@@ -137,27 +137,21 @@ class DispatchNotifier extends StateNotifier<DispatchState> {
     );
 
     try {
-      final success = await dispatcher.dispatch(command);
+      final result = await dispatcher.dispatch(command);
       if (!mounted) return;
-
-      if (!success) {
-        debugPrint('[SwarmApp] Server rejected command: ${command.label}');
-      } else {
-        debugPrint('[SwarmApp] Dispatched: ${command.label}');
-      }
 
       state = DispatchState(
         lastDispatched: command,
         isPending: false,
         isSending: false,
-        lastSuccess: success,
+        lastSuccess: result,
         error: null,
         cancelled: false,
       );
+      debugPrint(
+          '[SwarmApp] Dispatch result: ${result ? "SUCCESS" : "FAILED"}');
     } on CommandDispatchException catch (e) {
       if (!mounted) return;
-      debugPrint('[SwarmApp] Network error for ${command.label}: $e');
-
       state = DispatchState(
         lastDispatched: state.lastDispatched,
         isPending: false,
@@ -166,6 +160,17 @@ class DispatchNotifier extends StateNotifier<DispatchState> {
         error: e.message,
         cancelled: false,
       );
+    } finally {
+      if (mounted && state.isSending) {
+        state = DispatchState(
+          lastDispatched: state.lastDispatched,
+          isPending: state.isPending,
+          isSending: false,
+          lastSuccess: state.lastSuccess,
+          error: state.error,
+          cancelled: state.cancelled,
+        );
+      }
     }
   }
 
@@ -181,7 +186,6 @@ class DispatchNotifier extends StateNotifier<DispatchState> {
 ///
 /// Use `ref.watch(dispatchProvider)` to read [DispatchState].
 /// Use `ref.read(dispatchProvider.notifier).cancelPending()` to cancel.
-final dispatchProvider =
-    StateNotifierProvider<DispatchNotifier, DispatchState>(
+final dispatchProvider = StateNotifierProvider<DispatchNotifier, DispatchState>(
   (ref) => DispatchNotifier(ref),
 );

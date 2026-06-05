@@ -86,6 +86,24 @@ void main() {
     });
   });
 
+  group('IntentParser — cmdMission', () {
+    test('parses "start mission" → cmdMission', () {
+      expect(parser.parse('start mission'), CommandId.cmdMission);
+    });
+
+    test('parses "begin mission now" → cmdMission', () {
+      expect(parser.parse('begin mission now'), CommandId.cmdMission);
+    });
+
+    test('parses "initiate mission" → cmdMission', () {
+      expect(parser.parse('initiate mission'), CommandId.cmdMission);
+    });
+
+    test('parses "launch mission" → cmdMission', () {
+      expect(parser.parse('launch mission'), CommandId.cmdMission);
+    });
+  });
+
   group('IntentParser — unknown', () {
     test('parses "hello world" → unknown', () {
       expect(parser.parse('hello world'), CommandId.unknown);

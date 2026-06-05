@@ -41,6 +41,11 @@ class IntentParser {
     ('hold', CommandId.cmdHalt),
     ('freeze', CommandId.cmdHalt),
     ('abort', CommandId.cmdHalt),
+    ('start mission', CommandId.cmdMission),
+    ('begin mission', CommandId.cmdMission),
+    ('mission start', CommandId.cmdMission),
+    ('initiate mission', CommandId.cmdMission),
+    ('launch mission', CommandId.cmdMission),
   ];
 
   /// Normalises [rawTranscript] and returns the most-recently matched [CommandId].

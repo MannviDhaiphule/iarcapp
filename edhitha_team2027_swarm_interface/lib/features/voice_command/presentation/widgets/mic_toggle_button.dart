@@ -29,9 +29,7 @@ class MicToggleButton extends ConsumerWidget {
             ? AppTheme.colorAccentLight
             : AppTheme.colorSurface;
 
-    final Color iconColor = hasError
-        ? Colors.white
-        : AppTheme.colorAccent;
+    final Color iconColor = hasError ? Colors.white : AppTheme.colorAccent;
 
     final String label = isListening ? 'LISTENING...' : 'TAP TO SPEAK';
 
@@ -44,7 +42,8 @@ class MicToggleButton extends ConsumerWidget {
           color: bg,
           shape: BoxShape.circle,
           border: Border.all(
-            color: isListening ? AppTheme.colorAccent : AppTheme.colorSurfaceDark,
+            color:
+                isListening ? AppTheme.colorAccent : AppTheme.colorSurfaceDark,
             width: isListening ? 2.5 : 1.5,
           ),
           boxShadow: isListening

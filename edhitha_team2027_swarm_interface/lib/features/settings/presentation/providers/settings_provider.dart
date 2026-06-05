@@ -144,7 +144,8 @@ class Settings extends _$Settings {
   Future<void> updateMapImageUrl(String url) async {
     final current = _current();
     if (!url.startsWith('http://') && !url.startsWith('https://')) {
-      state = AsyncData(current.copyWith(error: 'URL must start with http:// or https://'));
+      state = AsyncData(
+          current.copyWith(error: 'URL must start with http:// or https://'));
       return;
     }
     state = AsyncData(current.copyWith(isSaving: true, error: null));
@@ -164,7 +165,8 @@ class Settings extends _$Settings {
   Future<void> updatePathTextUrl(String url) async {
     final current = _current();
     if (!url.startsWith('http://') && !url.startsWith('https://')) {
-      state = AsyncData(current.copyWith(error: 'URL must start with http:// or https://'));
+      state = AsyncData(
+          current.copyWith(error: 'URL must start with http:// or https://'));
       return;
     }
     state = AsyncData(current.copyWith(isSaving: true, error: null));

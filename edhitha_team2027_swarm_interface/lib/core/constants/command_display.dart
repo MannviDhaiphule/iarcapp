@@ -21,6 +21,8 @@ String commandLabel(CommandId id) {
       return 'CMD_DIR_R';
     case CommandId.cmdHalt:
       return 'CMD_HALT';
+    case CommandId.cmdMission:
+      return 'CMD_MISSION';
     case CommandId.unknown:
       return 'AWAITING INPUT';
   }
@@ -45,6 +47,8 @@ IconData commandIcon(CommandId id) {
       return Icons.arrow_forward;
     case CommandId.cmdHalt:
       return Icons.pan_tool;
+    case CommandId.cmdMission:
+      return Icons.flag;
     case CommandId.unknown:
       return Icons.mic_none;
   }

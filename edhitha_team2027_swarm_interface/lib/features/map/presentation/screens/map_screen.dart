@@ -59,8 +59,7 @@ class _MapScreenState extends ConsumerState<MapScreen> {
   }
 
   Future<void> _fetchMap() async {
-    final url =
-        ref.read(settingsProvider).valueOrNull?.mapImageUrl ?? '';
+    final url = ref.read(settingsProvider).valueOrNull?.mapImageUrl ?? '';
     if (url.isEmpty) return;
     try {
       final response = await http.get(Uri.parse(url));
@@ -88,8 +87,7 @@ class _MapScreenState extends ConsumerState<MapScreen> {
   }
 
   Future<void> _fetchPath() async {
-    final url =
-        ref.read(settingsProvider).valueOrNull?.pathTextUrl ?? '';
+    final url = ref.read(settingsProvider).valueOrNull?.pathTextUrl ?? '';
     if (url.isEmpty) return;
     try {
       final response = await http.get(Uri.parse(url));
@@ -162,8 +160,7 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                     else if (_mapError != null)
                       Center(
                         child: Padding(
-                          padding:
-                              const EdgeInsets.all(AppTheme.spacing32),
+                          padding: const EdgeInsets.all(AppTheme.spacing32),
                           child: Column(
                             children: [
                               const Icon(
@@ -174,8 +171,7 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                               const Gap(AppTheme.spacing8),
                               Text(
                                 _mapError!,
-                                style:
-                                    AppTextStyles.transcriptBody.copyWith(
+                                style: AppTextStyles.transcriptBody.copyWith(
                                   color: AppTheme.colorError,
                                 ),
                               ),

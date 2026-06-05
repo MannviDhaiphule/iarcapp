@@ -25,6 +25,8 @@ enum CommandId {
   /// Stop / freeze / abort.
   cmdHalt,
 
+  cmdMission, // Start mission — drone must be airborne
+
   /// No recognised command.
   unknown,
 }
@@ -50,6 +52,8 @@ extension CommandIdLabel on CommandId {
         return 'CMD_DIR_R';
       case CommandId.cmdHalt:
         return 'CMD_HALT';
+      case CommandId.cmdMission:
+        return 'CMD_MISSION';
       case CommandId.unknown:
         return 'UNKNOWN';
     }

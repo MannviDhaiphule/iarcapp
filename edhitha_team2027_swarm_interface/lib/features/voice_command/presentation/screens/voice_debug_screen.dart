@@ -93,8 +93,7 @@ class _VoiceDebugScreenState extends ConsumerState<VoiceDebugScreen> {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               DrawerHeader(
-                decoration:
-                    const BoxDecoration(color: AppTheme.colorAccent),
+                decoration: const BoxDecoration(color: AppTheme.colorAccent),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisAlignment: MainAxisAlignment.end,
@@ -185,8 +184,7 @@ class _VoiceDebugScreenState extends ConsumerState<VoiceDebugScreen> {
           title: Text('SWARM INTERFACE', style: AppTextStyles.appBarTitle),
           actions: [
             Padding(
-              padding:
-                  const EdgeInsets.only(right: AppTheme.spacing16),
+              padding: const EdgeInsets.only(right: AppTheme.spacing16),
               child: Center(
                 child: Text('v1.0', style: AppTextStyles.appBarVersion),
               ),

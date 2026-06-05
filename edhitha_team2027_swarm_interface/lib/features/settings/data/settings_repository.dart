@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../../core/constants/app_constants.dart';
@@ -10,25 +11,33 @@ class SettingsRepository {
   /// Returns the saved server IP, or [AppConstants.defaultServerIp] if not set.
   Future<String> getServerIp() async {
     final prefs = await SharedPreferences.getInstance();
-    return prefs.getString(_keyServerIp) ?? AppConstants.defaultServerIp;
+    final ip = prefs.getString(_keyServerIp) ?? AppConstants.defaultServerIp;
+    debugPrint('[SwarmApp] Loaded server IP: $ip');
+    return ip;
   }
 
   /// Returns the saved server port, or [AppConstants.defaultServerPort] if not set.
   Future<int> getServerPort() async {
     final prefs = await SharedPreferences.getInstance();
-    return prefs.getInt(_keyServerPort) ?? AppConstants.defaultServerPort;
+    final port = prefs.getInt(_keyServerPort) ?? AppConstants.defaultServerPort;
+    debugPrint('[SwarmApp] Loaded server port: $port');
+    return port;
   }
 
   /// Saves [ip] as the server IP address.
   Future<void> setServerIp(String ip) async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString(_keyServerIp, ip);
+    debugPrint('[SwarmApp] Saved server IP: $ip');
+    debugPrint(
+        '[SwarmApp] Verified saved IP: ${prefs.getString(_keyServerIp)}');
   }
 
   /// Saves [port] as the server port number.
   Future<void> setServerPort(int port) async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setInt(_keyServerPort, port);
+    debugPrint('[SwarmApp] Saved server port: $port');
   }
 
   /// Returns the full base URL: `http://<ip>:<port>`.

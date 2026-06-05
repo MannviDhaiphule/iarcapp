@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gap/gap.dart';
-import 'package:flutter/foundation.dart';
 import '../../../../core/constants/command_ids.dart';
 import '../../../../core/theme/app_text_styles.dart';
 import '../../../../core/theme/app_theme.dart';
@@ -24,6 +23,7 @@ class CommandsScreen extends ConsumerWidget {
     _CmdEntry(CommandId.cmdDirL, Icons.arrow_back, 'LEFT'),
     _CmdEntry(CommandId.cmdDirR, Icons.arrow_forward, 'RIGHT'),
     _CmdEntry(CommandId.cmdHalt, Icons.pan_tool, 'HALT'),
+    _CmdEntry(CommandId.cmdMission, Icons.flag, 'MISSION'),
   ];
 
   @override
@@ -56,11 +56,11 @@ class CommandsScreen extends ConsumerWidget {
                     return _CommandButton(
                       entry: entry,
                       onTap: () {
-  debugPrint('BUTTON PRESSED: ${entry.label}');
-  ref
-      .read(dispatchProvider.notifier)
-      .onIntentChanged(entry.id);
-},
+                        debugPrint('BUTTON PRESSED: ${entry.label}');
+                        ref
+                            .read(dispatchProvider.notifier)
+                            .onIntentChanged(entry.id);
+                      },
                     );
                   },
                 ),

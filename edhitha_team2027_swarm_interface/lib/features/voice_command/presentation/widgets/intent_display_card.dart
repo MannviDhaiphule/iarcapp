@@ -31,7 +31,9 @@ class IntentDisplayCard extends ConsumerWidget {
         color: AppTheme.colorSurface,
         borderRadius: AppTheme.radiusCard,
         border: Border.all(
-          color: isKnown ? AppTheme.colorSuccess.withValues(alpha: 0.4) : AppTheme.colorSurfaceDark,
+          color: isKnown
+              ? AppTheme.colorSuccess.withValues(alpha: 0.4)
+              : AppTheme.colorSurfaceDark,
         ),
       ),
       padding: const EdgeInsets.all(AppTheme.spacing24),
@@ -56,7 +58,9 @@ class IntentDisplayCard extends ConsumerWidget {
               Icon(
                 icon,
                 size: 36,
-                color: isKnown ? AppTheme.colorAccent : AppTheme.colorTextSecondary,
+                color: isKnown
+                    ? AppTheme.colorAccent
+                    : AppTheme.colorTextSecondary,
               ),
             ],
           ),
@@ -78,9 +82,7 @@ class IntentDisplayCard extends ConsumerWidget {
           ),
         ],
       ),
-    )
-        .animate(key: ValueKey(intent))
-        .fadeIn(duration: 200.ms)
-        .scaleXY(begin: 0.97, end: 1.0, duration: 200.ms, curve: Curves.easeOut);
+    ).animate(key: ValueKey(intent)).fadeIn(duration: 200.ms).scaleXY(
+        begin: 0.97, end: 1.0, duration: 200.ms, curve: Curves.easeOut);
   }
 }

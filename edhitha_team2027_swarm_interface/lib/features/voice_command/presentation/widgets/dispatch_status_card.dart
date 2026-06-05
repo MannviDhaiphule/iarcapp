@@ -17,8 +17,7 @@ class DispatchStatusCard extends ConsumerStatefulWidget {
   const DispatchStatusCard({super.key});
 
   @override
-  ConsumerState<DispatchStatusCard> createState() =>
-      _DispatchStatusCardState();
+  ConsumerState<DispatchStatusCard> createState() => _DispatchStatusCardState();
 }
 
 class _DispatchStatusCardState extends ConsumerState<DispatchStatusCard>

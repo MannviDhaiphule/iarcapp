@@ -47,16 +47,23 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     final ip = _ipController.text.trim().isEmpty
         ? AppConstants.defaultServerIp
         : _ipController.text.trim();
-    final port =
-        int.tryParse(_portController.text.trim()) ?? AppConstants.defaultServerPort;
+    final port = int.tryParse(_portController.text.trim()) ??
+        AppConstants.defaultServerPort;
     return 'http://$ip:$port';
   }
 
   void _saveServer() {
     final port = int.tryParse(_portController.text.trim());
     if (port == null) return;
-    ref.read(settingsProvider.notifier).updateServerIp(_ipController.text.trim());
+    ref
+        .read(settingsProvider.notifier)
+        .updateServerIp(_ipController.text.trim());
     ref.read(settingsProvider.notifier).updateServerPort(port);
+
+    final ip = _ipController.text.trim();
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text('Server URL updated: http://$ip:$port')),
+    );
   }
 
   void _resetServer() {
@@ -77,8 +84,12 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
   }
 
   void _resetMap() {
-    ref.read(settingsProvider.notifier).updateMapImageUrl(AppConstants.defaultMapImageUrl);
-    ref.read(settingsProvider.notifier).updatePathTextUrl(AppConstants.defaultPathTextUrl);
+    ref
+        .read(settingsProvider.notifier)
+        .updateMapImageUrl(AppConstants.defaultMapImageUrl);
+    ref
+        .read(settingsProvider.notifier)
+        .updatePathTextUrl(AppConstants.defaultPathTextUrl);
     _mapUrlController.text = AppConstants.defaultMapImageUrl;
     _pathUrlController.text = AppConstants.defaultPathTextUrl;
   }
@@ -159,7 +170,9 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                     ),
                   ),
                   const Gap(AppTheme.spacing16),
-                  _buildButtons(onSave: isSaving ? null : _saveServer, onReset: _resetServer),
+                  _buildButtons(
+                      onSave: isSaving ? null : _saveServer,
+                      onReset: _resetServer),
                   if (savedSuccess) ...[
                     const Gap(AppTheme.spacing8),
                     Text(
@@ -225,7 +238,8 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                     ),
                   ),
                   const Gap(AppTheme.spacing16),
-                  _buildButtons(onSave: isSaving ? null : _saveMap, onReset: _resetMap),
+                  _buildButtons(
+                      onSave: isSaving ? null : _saveMap, onReset: _resetMap),
                 ],
               ),
             ],
