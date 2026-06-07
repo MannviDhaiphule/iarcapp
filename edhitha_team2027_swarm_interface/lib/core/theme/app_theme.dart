@@ -8,38 +8,22 @@ class AppTheme {
   AppTheme._();
 
   // ---------------------------------------------------------------------------
-  // Color tokens (exact hex values from PRD §5)
+  // Color tokens
   // ---------------------------------------------------------------------------
 
-  /// All screen backgrounds.
-  static const Color colorBackground = Color(0xFFF7F8FA);
-
-  /// Cards, containers.
-  static const Color colorSurface = Color(0xFFECEEF2);
-
-  /// Dividers, borders.
-  static const Color colorSurfaceDark = Color(0xFFD5D9E0);
-
-  /// Active mic, safe paths, CTAs.
-  static const Color colorAccent = Color(0xFF2563EB);
-
-  /// Active mic background glow.
-  static const Color colorAccentLight = Color(0xFFEFF4FF);
-
-  /// Valid CMD recognized.
-  static const Color colorSuccess = Color(0xFF16A34A);
-
-  /// Partial / ambiguous match.
-  static const Color colorWarning = Color(0xFFD97706);
-
-  /// No match / mic error.
-  static const Color colorError = Color(0xFFDC2626);
-
-  /// Headlines, CMD labels.
-  static const Color colorTextPrimary = Color(0xFF111827);
-
-  /// Captions, metadata.
-  static const Color colorTextSecondary = Color(0xFF6B7280);
+  static const Color colorBackground = Color(0xFF0A0E1A);
+  static const Color colorSurface = Color(0xFF111827);
+  static const Color colorSurfaceElevated = Color(0xFF1C2333);
+  static const Color colorBorder = Color(0xFF2A3352);
+  static const Color colorAccent = Color(0xFF3B82F6);
+  static const Color colorAccentGlow = Color(0xFF1D4ED8);
+  static const Color colorAccentLight = Color(0xFF1E3A5F);
+  static const Color colorSuccess = Color(0xFF10B981);
+  static const Color colorWarning = Color(0xFFF59E0B);
+  static const Color colorError = Color(0xFFEF4444);
+  static const Color colorTextPrimary = Color(0xFFF1F5F9);
+  static const Color colorTextSecondary = Color(0xFF64748B);
+  static const Color colorGlass = Color(0x0DFFFFFF);
 
   // ---------------------------------------------------------------------------
   // Spacing — base-8 grid (PRD §5)
@@ -113,6 +97,7 @@ class AppTheme {
         scrolledUnderElevation: 0,
         titleTextStyle: AppTextStyles.appBarTitle,
         iconTheme: const IconThemeData(color: colorTextPrimary),
+        shape: const Border(bottom: BorderSide(color: colorBorder, width: 1)),
       ),
       cardTheme: const CardThemeData(
         color: colorSurface,

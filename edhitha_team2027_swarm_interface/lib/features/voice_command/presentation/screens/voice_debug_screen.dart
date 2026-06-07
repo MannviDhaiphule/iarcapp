@@ -7,6 +7,8 @@ import '../../../../core/theme/app_text_styles.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../providers/asr_provider.dart';
 import '../providers/intent_provider.dart';
+import '../providers/dispatch_provider.dart';
+import 'package:google_fonts/google_fonts.dart';
 import '../widgets/dispatch_status_card.dart';
 import '../widgets/intent_display_card.dart';
 import '../widgets/mic_toggle_button.dart';
@@ -80,114 +82,53 @@ class _VoiceDebugScreenState extends ConsumerState<VoiceDebugScreen> {
       }
     });
 
+    final dispatchState = ref.watch(dispatchProvider);
+    final bool? lastSuccess = dispatchState.lastSuccess;
+    
+    Color statusColor = AppTheme.colorTextSecondary;
+    String statusText = 'STANDBY';
+    if (lastSuccess == true) {
+      statusColor = AppTheme.colorSuccess;
+      statusText = 'ONLINE';
+    } else if (lastSuccess == false || dispatchState.error != null) {
+      statusColor = AppTheme.colorError;
+      statusText = 'OFFLINE';
+    }
+
     return AnnotatedRegion<SystemUiOverlayStyle>(
       value: SystemUiOverlayStyle.dark.copyWith(
         statusBarColor: Colors.transparent,
       ),
       child: Scaffold(
         backgroundColor: AppTheme.colorBackground,
-        // ── Hamburger navigation drawer ─────────────────────────────────
-        drawer: Drawer(
-          backgroundColor: AppTheme.colorBackground,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              DrawerHeader(
-                decoration: const BoxDecoration(color: AppTheme.colorAccent),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  children: [
-                    Text(
-                      'SWARM INTERFACE',
-                      style: AppTextStyles.appBarTitle.copyWith(
-                        color: Colors.white,
-                      ),
-                    ),
-                    const Gap(AppTheme.spacing4),
-                    Text(
-                      'v1.0',
-                      style: AppTextStyles.appBarVersion.copyWith(
-                        color: Colors.white70,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              ListTile(
-                leading: const Icon(
-                  Icons.settings,
-                  color: AppTheme.colorAccent,
-                ),
-                title: Text(
-                  'Settings',
-                  style: AppTextStyles.transcriptBody.copyWith(
-                    color: AppTheme.colorTextPrimary,
-                  ),
-                ),
-                onTap: () {
-                  Navigator.pop(context); // close drawer first
-                  Navigator.pushNamed(context, '/settings');
-                },
-              ),
-              ListTile(
-                leading: const Icon(
-                  Icons.gamepad,
-                  color: AppTheme.colorAccent,
-                ),
-                title: Text(
-                  'Commands',
-                  style: AppTextStyles.transcriptBody.copyWith(
-                    color: AppTheme.colorTextPrimary,
-                  ),
-                ),
-                onTap: () {
-                  Navigator.pop(context);
-                  Navigator.pushNamed(context, '/commands');
-                },
-              ),
-              ListTile(
-                leading: const Icon(
-                  Icons.map,
-                  color: AppTheme.colorAccent,
-                ),
-                title: Text(
-                  'Map',
-                  style: AppTextStyles.transcriptBody.copyWith(
-                    color: AppTheme.colorTextPrimary,
-                  ),
-                ),
-                onTap: () {
-                  Navigator.pop(context);
-                  Navigator.pushNamed(context, '/map');
-                },
-              ),
-              // Space reserved for future drawer items.
-            ],
-          ),
-        ),
         appBar: AppBar(
           backgroundColor: AppTheme.colorBackground,
           elevation: 0,
           scrolledUnderElevation: 0,
-          titleSpacing: 0,
-          // Hamburger button — Builder provides a context below Scaffold.
-          leading: Builder(
-            builder: (context) => IconButton(
-              icon: const Icon(
-                Icons.menu,
-                color: AppTheme.colorTextPrimary,
-              ),
-              onPressed: () => Scaffold.of(context).openDrawer(),
-            ),
-          ),
+          titleSpacing: AppTheme.spacing16,
           title: Text('SWARM INTERFACE', style: AppTextStyles.appBarTitle),
           actions: [
-            Padding(
-              padding: const EdgeInsets.only(right: AppTheme.spacing16),
-              child: Center(
-                child: Text('v1.0', style: AppTextStyles.appBarVersion),
-              ),
+            Row(
+              children: [
+                Container(
+                  width: 8,
+                  height: 8,
+                  decoration: BoxDecoration(
+                    color: statusColor,
+                    borderRadius: BorderRadius.circular(9999),
+                  ),
+                ),
+                const Gap(AppTheme.spacing4),
+                Text(
+                  statusText,
+                  style: GoogleFonts.spaceMono(
+                    fontSize: 10,
+                    color: statusColor,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                const Gap(AppTheme.spacing16),
+              ],
             ),
           ],
         ),

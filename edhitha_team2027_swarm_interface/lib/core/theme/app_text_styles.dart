@@ -7,12 +7,12 @@ import 'app_theme.dart';
 class AppTextStyles {
   AppTextStyles._();
 
-  /// App bar title: DM Sans, 16 sp, semi-bold, primary text colour.
-  static TextStyle get appBarTitle => GoogleFonts.dmSans(
+  /// App bar title: Space Mono, 16 sp, semi-bold, primary text colour.
+  static TextStyle get appBarTitle => GoogleFonts.spaceMono(
         fontSize: 16,
         fontWeight: FontWeight.w600,
         color: AppTheme.colorTextPrimary,
-        letterSpacing: 1.2,
+        letterSpacing: 2.0,
       );
 
   /// Version label shown in the AppBar trailing slot.
@@ -23,8 +23,8 @@ class AppTextStyles {
       );
 
   /// Large command label on the Intent Display Card.
-  static TextStyle get cmdLabel => GoogleFonts.dmSans(
-        fontSize: 22,
+  static TextStyle get cmdLabel => GoogleFonts.spaceMono(
+        fontSize: 18,
         fontWeight: FontWeight.w700,
         color: AppTheme.colorTextPrimary,
         letterSpacing: 0.5,
@@ -39,7 +39,7 @@ class AppTextStyles {
       );
 
   /// Chip label text.
-  static TextStyle get chipLabel => GoogleFonts.dmSans(
+  static TextStyle get chipLabel => GoogleFonts.spaceMono(
         fontSize: 11,
         fontWeight: FontWeight.w600,
         letterSpacing: 0.8,
@@ -53,7 +53,7 @@ class AppTextStyles {
       );
 
   /// Timestamp label in transcription rows.
-  static TextStyle get timestamp => GoogleFonts.dmSans(
+  static TextStyle get timestamp => GoogleFonts.spaceMono(
         fontSize: 11,
         fontWeight: FontWeight.w500,
         color: AppTheme.colorTextSecondary,

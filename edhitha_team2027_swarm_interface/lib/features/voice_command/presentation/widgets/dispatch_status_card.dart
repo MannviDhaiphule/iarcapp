@@ -1,3 +1,4 @@
+import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -110,77 +111,93 @@ class _DispatchStatusCardState extends ConsumerState<DispatchStatusCard>
 
     return Container(
       decoration: BoxDecoration(
-        color: AppTheme.colorSurface,
-        borderRadius: AppTheme.radiusCard,
-        border: Border.all(color: AppTheme.colorSurfaceDark),
-      ),
-      padding: const EdgeInsets.all(AppTheme.spacing16),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text('DISPATCH STATUS', style: AppTextStyles.cardTitle),
-          const Gap(AppTheme.spacing12),
-
-          // Status row
-          Row(
-            children: [
-              Icon(display.icon, color: display.color, size: 20),
-              const Gap(AppTheme.spacing8),
-              Expanded(
-                child: Text(
-                  display.label,
-                  style: AppTextStyles.transcriptBody.copyWith(
-                    color: display.color,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-              ),
-            ],
-          ),
-
-          const Gap(AppTheme.spacing12),
-
-          // Countdown progress bar — animates 1.0 → 0.0 over 5 s
-          AnimatedBuilder(
-            animation: _progress,
-            builder: (context, _) => LinearProgressIndicator(
-              value: state.isPending ? (1.0 - _progress.value) : 0.0,
-              backgroundColor: AppTheme.colorSurfaceDark,
-              color: AppTheme.colorWarning,
-              minHeight: 4,
-              borderRadius: BorderRadius.circular(4),
-            ),
-          ),
-
-          // Cancel button — visible only while pending; fades in/out
-          AnimatedSwitcher(
-            duration: const Duration(milliseconds: 150),
-            transitionBuilder: (child, animation) =>
-                FadeTransition(opacity: animation, child: child),
-            child: state.isPending
-                ? Padding(
-                    key: const ValueKey('cancel-btn'),
-                    padding: const EdgeInsets.only(top: AppTheme.spacing12),
-                    child: SizedBox(
-                      width: double.infinity,
-                      child: OutlinedButton.icon(
-                        onPressed: () =>
-                            ref.read(dispatchProvider.notifier).cancelPending(),
-                        icon: const Icon(Icons.cancel_outlined, size: 16),
-                        label: const Text('CANCEL'),
-                        style: OutlinedButton.styleFrom(
-                          foregroundColor: AppTheme.colorError,
-                          side: const BorderSide(color: AppTheme.colorError),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                        ),
-                      ).animate().fadeIn(duration: 150.ms),
-                    ),
-                  )
-                : const SizedBox.shrink(key: ValueKey('cancel-hidden')),
+        color: AppTheme.colorGlass,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: AppTheme.colorBorder, width: 1),
+        boxShadow: [
+          BoxShadow(
+            color: AppTheme.colorAccentGlow.withValues(alpha: 0.08),
+            blurRadius: 24,
+            spreadRadius: 0,
+            offset: const Offset(0, 4),
           ),
         ],
+      ),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(16),
+        child: BackdropFilter(
+          filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+          child: Padding(
+            padding: const EdgeInsets.all(AppTheme.spacing16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text('DISPATCH STATUS', style: AppTextStyles.cardTitle),
+                const Gap(AppTheme.spacing12),
+
+                // Status row
+                Row(
+                  children: [
+                    Icon(display.icon, color: display.color, size: 20),
+                    const Gap(AppTheme.spacing8),
+                    Expanded(
+                      child: Text(
+                        display.label,
+                        style: AppTextStyles.transcriptBody.copyWith(
+                          color: display.color,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+
+                const Gap(AppTheme.spacing12),
+
+                // Countdown progress bar — animates 1.0 → 0.0 over 5 s
+                AnimatedBuilder(
+                  animation: _progress,
+                  builder: (context, _) => LinearProgressIndicator(
+                    value: state.isPending ? (1.0 - _progress.value) : 0.0,
+                    backgroundColor: AppTheme.colorSurfaceElevated,
+                    color: AppTheme.colorWarning,
+                    minHeight: 4,
+                    borderRadius: BorderRadius.circular(4),
+                  ),
+                ),
+
+                // Cancel button — visible only while pending; fades in/out
+                AnimatedSwitcher(
+                  duration: const Duration(milliseconds: 150),
+                  transitionBuilder: (child, animation) =>
+                      FadeTransition(opacity: animation, child: child),
+                  child: state.isPending
+                      ? Padding(
+                          key: const ValueKey('cancel-btn'),
+                          padding: const EdgeInsets.only(top: AppTheme.spacing12),
+                          child: SizedBox(
+                            width: double.infinity,
+                            child: OutlinedButton.icon(
+                              onPressed: () =>
+                                  ref.read(dispatchProvider.notifier).cancelPending(),
+                              icon: const Icon(Icons.cancel_outlined, size: 16),
+                              label: const Text('CANCEL'),
+                              style: OutlinedButton.styleFrom(
+                                foregroundColor: AppTheme.colorError,
+                                side: const BorderSide(color: AppTheme.colorError),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                              ),
+                            ).animate().fadeIn(duration: 150.ms),
+                          ),
+                        )
+                      : const SizedBox.shrink(key: ValueKey('cancel-hidden')),
+                ),
+              ],
+            ),
+          ),
+        ),
       ),
     );
   }

@@ -56,12 +56,12 @@ IconData commandIcon(CommandId id) {
 
 /// Returns the accent color for the status chip based on [CommandId].
 Color commandChipColor(CommandId id) {
-  if (id == CommandId.unknown) return AppTheme.colorSurfaceDark;
-  return AppTheme.colorSuccess;
+  if (id == CommandId.unknown) return AppTheme.colorSurfaceElevated;
+  return AppTheme.colorSuccess.withValues(alpha: 0.15);
 }
 
 /// Returns the text color for the chip label based on [CommandId].
 Color commandChipTextColor(CommandId id) {
   if (id == CommandId.unknown) return AppTheme.colorTextSecondary;
-  return Colors.white;
+  return AppTheme.colorSuccess;
 }

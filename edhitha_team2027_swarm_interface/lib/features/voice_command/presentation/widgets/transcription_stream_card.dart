@@ -1,3 +1,4 @@
+import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -70,69 +71,86 @@ class _TranscriptionStreamCardState
 
     return Container(
       decoration: BoxDecoration(
-        color: AppTheme.colorSurface,
-        borderRadius: AppTheme.radiusCard,
-        border: Border.all(color: AppTheme.colorSurfaceDark),
-      ),
-      padding: const EdgeInsets.all(AppTheme.spacing16),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text('TRANSCRIPTION STREAM', style: AppTextStyles.cardTitle),
-          const Gap(AppTheme.spacing12),
-          if (_entries.isEmpty)
-            Padding(
-              padding: const EdgeInsets.symmetric(vertical: AppTheme.spacing8),
-              child: Text(
-                'Waiting for voice input…',
-                style: AppTextStyles.transcriptBody.copyWith(
-                  color: AppTheme.colorTextSecondary,
-                  fontStyle: FontStyle.italic,
-                ),
-              ),
-            )
-          else
-            ListView.separated(
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              itemCount: _entries.length,
-              separatorBuilder: (_, __) => const Divider(
-                height: 1,
-                thickness: 1,
-              ),
-              itemBuilder: (context, index) {
-                final entry = _entries[index];
-                return Padding(
-                  padding: const EdgeInsets.symmetric(
-                    vertical: AppTheme.spacing6,
-                  ),
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(entry.timestamp, style: AppTextStyles.timestamp),
-                      const Gap(AppTheme.spacing12),
-                      Expanded(
-                        child: Text(
-                          entry.text,
-                          style: AppTextStyles.transcriptBody,
-                          maxLines: 2,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      ),
-                    ],
-                  ),
-                )
-                    .animate()
-                    .slideY(
-                      begin: 0.3,
-                      end: 0.0,
-                      duration: 250.ms,
-                      curve: Curves.easeOut,
-                    )
-                    .fadeIn(duration: 250.ms);
-              },
-            ),
+        color: AppTheme.colorGlass,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: AppTheme.colorBorder, width: 1),
+        boxShadow: [
+          BoxShadow(
+            color: AppTheme.colorAccentGlow.withValues(alpha: 0.08),
+            blurRadius: 24,
+            spreadRadius: 0,
+            offset: const Offset(0, 4),
+          ),
         ],
+      ),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(16),
+        child: BackdropFilter(
+          filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+          child: Padding(
+            padding: const EdgeInsets.all(AppTheme.spacing16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text('TRANSCRIPTION STREAM', style: AppTextStyles.cardTitle),
+                const Gap(AppTheme.spacing12),
+                if (_entries.isEmpty)
+                  Padding(
+                    padding: const EdgeInsets.symmetric(vertical: AppTheme.spacing8),
+                    child: Text(
+                      'Waiting for voice input…',
+                      style: AppTextStyles.transcriptBody.copyWith(
+                        color: AppTheme.colorTextSecondary,
+                        fontStyle: FontStyle.italic,
+                      ),
+                    ),
+                  )
+                else
+                  ListView.separated(
+                    shrinkWrap: true,
+                    physics: const NeverScrollableScrollPhysics(),
+                    itemCount: _entries.length,
+                    separatorBuilder: (_, __) => const Divider(
+                      height: 1,
+                      thickness: 1,
+                      color: AppTheme.colorBorder,
+                    ),
+                    itemBuilder: (context, index) {
+                      final entry = _entries[index];
+                      return Padding(
+                        padding: const EdgeInsets.symmetric(
+                          vertical: AppTheme.spacing6,
+                        ),
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(entry.timestamp, style: AppTextStyles.timestamp),
+                            const Gap(AppTheme.spacing12),
+                            Expanded(
+                              child: Text(
+                                entry.text,
+                                style: AppTextStyles.transcriptBody,
+                                maxLines: 2,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ),
+                          ],
+                        ),
+                      )
+                          .animate()
+                          .slideY(
+                            begin: 0.3,
+                            end: 0.0,
+                            duration: 250.ms,
+                            curve: Curves.easeOut,
+                          )
+                          .fadeIn(duration: 250.ms);
+                    },
+                  ),
+              ],
+            ),
+          ),
+        ),
       ),
     );
   }

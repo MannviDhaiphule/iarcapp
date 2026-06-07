@@ -1,4 +1,6 @@
+import 'dart:ui';
 import 'package:flutter/material.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gap/gap.dart';
 import '../../../../core/constants/command_ids.dart';
@@ -31,6 +33,7 @@ class CommandsScreen extends ConsumerWidget {
     return Scaffold(
       backgroundColor: AppTheme.colorBackground,
       appBar: AppBar(
+        automaticallyImplyLeading: false,
         backgroundColor: AppTheme.colorBackground,
         elevation: 0,
         scrolledUnderElevation: 0,
@@ -92,7 +95,7 @@ class _CmdEntry {
 }
 
 /// A single tappable command button rendered within the grid.
-class _CommandButton extends StatelessWidget {
+class _CommandButton extends StatefulWidget {
   /// Creates a [_CommandButton].
   const _CommandButton({required this.entry, required this.onTap});
 
@@ -103,28 +106,62 @@ class _CommandButton extends StatelessWidget {
   final VoidCallback onTap;
 
   @override
+  State<_CommandButton> createState() => _CommandButtonState();
+}
+
+class _CommandButtonState extends State<_CommandButton> {
+  bool _isTapped = false;
+
+  void _handleTap() {
+    setState(() => _isTapped = true);
+    widget.onTap();
+    Future.delayed(const Duration(milliseconds: 300), () {
+      if (mounted) setState(() => _isTapped = false);
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return Material(
-      color: AppTheme.colorSurface,
-      borderRadius: BorderRadius.circular(16),
-      child: InkWell(
-        borderRadius: BorderRadius.circular(16),
-        onTap: onTap,
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(entry.icon, size: 32, color: AppTheme.colorAccent),
-            const Gap(AppTheme.spacing8),
-            Text(
-              entry.label,
-              style: AppTextStyles.transcriptBody.copyWith(
-                fontWeight: FontWeight.w700,
-                color: AppTheme.colorTextPrimary,
-              ),
-            ),
-          ],
+    return GestureDetector(
+      onTap: _handleTap,
+      child: Container(
+        decoration: BoxDecoration(
+          color: AppTheme.colorGlass,
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(color: AppTheme.colorBorder, width: 1),
         ),
-      ),
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(16),
+          child: BackdropFilter(
+            filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(widget.entry.icon, size: 32, color: AppTheme.colorAccent),
+                const Gap(AppTheme.spacing8),
+                Text(
+                  widget.entry.label,
+                  style: AppTextStyles.cmdLabel.copyWith(
+                    fontWeight: FontWeight.w700,
+                    color: AppTheme.colorTextPrimary,
+                    fontSize: 14,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      )
+          .animate(target: _isTapped ? 1 : 0)
+          .tint(color: AppTheme.colorAccent.withValues(alpha: 0.2), duration: 150.ms)
+          .scaleXY(end: 0.95, duration: 100.ms)
+          .boxShadow(
+            end: BoxShadow(
+              color: AppTheme.colorAccentGlow.withValues(alpha: 0.5),
+              blurRadius: 20,
+            ),
+            duration: 150.ms,
+          ),
     );
   }
 }

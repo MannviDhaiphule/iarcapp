@@ -43,7 +43,7 @@ class MicToggleButton extends ConsumerWidget {
           shape: BoxShape.circle,
           border: Border.all(
             color:
-                isListening ? AppTheme.colorAccent : AppTheme.colorSurfaceDark,
+                isListening ? AppTheme.colorAccent : AppTheme.colorBorder,
             width: isListening ? 2.5 : 1.5,
           ),
           boxShadow: isListening
@@ -66,18 +66,47 @@ class MicToggleButton extends ConsumerWidget {
 
     // Pulsing animation when listening
     if (isListening) {
-      button = button
-          .animate(onPlay: (controller) => controller.repeat(reverse: true))
-          .scaleXY(
-            begin: 1.0,
-            end: 1.08,
-            duration: 700.ms,
-            curve: Curves.easeInOut,
+      button = Stack(
+        alignment: Alignment.center,
+        children: [
+          // Expanding ring 1
+          Container(
+            width: _size,
+            height: _size,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              border: Border.all(color: AppTheme.colorAccent, width: 2),
+            ),
           )
-          .shimmer(
-            duration: 1200.ms,
-            color: AppTheme.colorAccent.withValues(alpha: 0.2),
-          );
+              .animate(onPlay: (controller) => controller.repeat())
+              .scaleXY(begin: 1.0, end: 1.6, duration: 1500.ms, curve: Curves.easeOut)
+              .fadeOut(duration: 1500.ms, curve: Curves.easeOut),
+
+          // Expanding ring 2
+          Container(
+            width: _size,
+            height: _size,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              border: Border.all(color: AppTheme.colorAccent, width: 2),
+            ),
+          )
+              .animate(delay: 750.ms, onPlay: (controller) => controller.repeat())
+              .scaleXY(begin: 1.0, end: 1.6, duration: 1500.ms, curve: Curves.easeOut)
+              .fadeOut(duration: 1500.ms, curve: Curves.easeOut),
+
+          button
+              .animate(onPlay: (controller) => controller.repeat(reverse: true))
+              .scaleXY(
+                begin: 1.0,
+                end: 1.08,
+                duration: 700.ms,
+                curve: Curves.easeInOut,
+              )
+              // tint instead of shimmer
+              .tint(color: Colors.white, duration: 700.ms, end: 0.1),
+        ],
+      );
     }
 
     return Column(

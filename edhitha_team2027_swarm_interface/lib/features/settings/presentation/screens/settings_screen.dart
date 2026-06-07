@@ -1,3 +1,4 @@
+import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -117,6 +118,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     return Scaffold(
       backgroundColor: AppTheme.colorBackground,
       appBar: AppBar(
+        automaticallyImplyLeading: false,
         backgroundColor: AppTheme.colorBackground,
         elevation: 0,
         scrolledUnderElevation: 0,
@@ -145,9 +147,18 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                     decoration: InputDecoration(
                       hintText: AppConstants.defaultServerIp,
                       filled: true,
-                      fillColor: AppTheme.colorBackground,
+                      fillColor: AppTheme.colorSurfaceElevated,
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(8),
+                        borderSide: const BorderSide(color: AppTheme.colorBorder),
+                      ),
+                      enabledBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(8),
+                        borderSide: const BorderSide(color: AppTheme.colorBorder),
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(8),
+                        borderSide: const BorderSide(color: AppTheme.colorAccent),
                       ),
                       errorText: error,
                       errorStyle: const TextStyle(color: AppTheme.colorError),
@@ -163,9 +174,18 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                     decoration: InputDecoration(
                       hintText: AppConstants.defaultServerPort.toString(),
                       filled: true,
-                      fillColor: AppTheme.colorBackground,
+                      fillColor: AppTheme.colorSurfaceElevated,
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(8),
+                        borderSide: const BorderSide(color: AppTheme.colorBorder),
+                      ),
+                      enabledBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(8),
+                        borderSide: const BorderSide(color: AppTheme.colorBorder),
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(8),
+                        borderSide: const BorderSide(color: AppTheme.colorAccent),
                       ),
                     ),
                   ),
@@ -215,9 +235,18 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                     decoration: InputDecoration(
                       hintText: AppConstants.defaultMapImageUrl,
                       filled: true,
-                      fillColor: AppTheme.colorBackground,
+                      fillColor: AppTheme.colorSurfaceElevated,
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(8),
+                        borderSide: const BorderSide(color: AppTheme.colorBorder),
+                      ),
+                      enabledBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(8),
+                        borderSide: const BorderSide(color: AppTheme.colorBorder),
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(8),
+                        borderSide: const BorderSide(color: AppTheme.colorAccent),
                       ),
                     ),
                   ),
@@ -231,9 +260,18 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                     decoration: InputDecoration(
                       hintText: AppConstants.defaultPathTextUrl,
                       filled: true,
-                      fillColor: AppTheme.colorBackground,
+                      fillColor: AppTheme.colorSurfaceElevated,
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(8),
+                        borderSide: const BorderSide(color: AppTheme.colorBorder),
+                      ),
+                      enabledBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(8),
+                        borderSide: const BorderSide(color: AppTheme.colorBorder),
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(8),
+                        borderSide: const BorderSide(color: AppTheme.colorAccent),
                       ),
                     ),
                   ),
@@ -253,18 +291,34 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
   Widget _buildCard({required String title, required List<Widget> children}) {
     return Container(
       decoration: BoxDecoration(
-        color: AppTheme.colorSurface,
-        borderRadius: AppTheme.radiusCard,
-        border: Border.all(color: AppTheme.colorSurfaceDark),
-      ),
-      padding: const EdgeInsets.all(AppTheme.spacing16),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(title, style: AppTextStyles.cardTitle),
-          const Gap(AppTheme.spacing16),
-          ...children,
+        color: AppTheme.colorGlass,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: AppTheme.colorBorder, width: 1),
+        boxShadow: [
+          BoxShadow(
+            color: AppTheme.colorAccentGlow.withValues(alpha: 0.08),
+            blurRadius: 24,
+            spreadRadius: 0,
+            offset: const Offset(0, 4),
+          ),
         ],
+      ),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(16),
+        child: BackdropFilter(
+          filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+          child: Padding(
+            padding: const EdgeInsets.all(AppTheme.spacing16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(title, style: AppTextStyles.cardTitle),
+                const Gap(AppTheme.spacing16),
+                ...children,
+              ],
+            ),
+          ),
+        ),
       ),
     );
   }
@@ -286,7 +340,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
             onPressed: onSave,
             style: FilledButton.styleFrom(
               backgroundColor: AppTheme.colorAccent,
-              disabledBackgroundColor: AppTheme.colorSurfaceDark,
+              disabledBackgroundColor: AppTheme.colorSurfaceElevated,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(12),
               ),

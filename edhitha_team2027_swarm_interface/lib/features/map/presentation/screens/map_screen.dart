@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:typed_data';
 
+import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gap/gap.dart';
@@ -126,6 +127,7 @@ class _MapScreenState extends ConsumerState<MapScreen> {
     return Scaffold(
       backgroundColor: AppTheme.colorBackground,
       appBar: AppBar(
+        automaticallyImplyLeading: false,
         backgroundColor: AppTheme.colorBackground,
         elevation: 0,
         scrolledUnderElevation: 0,
@@ -140,14 +142,27 @@ class _MapScreenState extends ConsumerState<MapScreen> {
               // ── Live Map card ──────────────────────────────────────────
               Container(
                 decoration: BoxDecoration(
-                  color: AppTheme.colorSurface,
-                  borderRadius: AppTheme.radiusCard,
-                  border: Border.all(color: AppTheme.colorSurfaceDark),
+                  color: AppTheme.colorGlass,
+                  borderRadius: BorderRadius.circular(16),
+                  border: Border.all(color: AppTheme.colorBorder, width: 1),
+                  boxShadow: [
+                    BoxShadow(
+                      color: AppTheme.colorAccentGlow.withValues(alpha: 0.08),
+                      blurRadius: 24,
+                      spreadRadius: 0,
+                      offset: const Offset(0, 4),
+                    ),
+                  ],
                 ),
-                padding: const EdgeInsets.all(AppTheme.spacing16),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(16),
+                  child: BackdropFilter(
+                    filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+                    child: Padding(
+                      padding: const EdgeInsets.all(AppTheme.spacing16),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
                     Text('LIVE MAP', style: AppTextStyles.cardTitle),
                     const Gap(AppTheme.spacing12),
                     if (_mapLoading)
@@ -196,20 +211,36 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                   ],
                 ),
               ),
-              const Gap(AppTheme.spacing16),
+            ),
+          ),
+        ),
+        const Gap(AppTheme.spacing16),
 
               // ── Path text card ─────────────────────────────────────────
               Container(
                 constraints: const BoxConstraints(maxHeight: 300),
                 decoration: BoxDecoration(
-                  color: AppTheme.colorSurface,
-                  borderRadius: AppTheme.radiusCard,
-                  border: Border.all(color: AppTheme.colorSurfaceDark),
+                  color: AppTheme.colorGlass,
+                  borderRadius: BorderRadius.circular(16),
+                  border: Border.all(color: AppTheme.colorBorder, width: 1),
+                  boxShadow: [
+                    BoxShadow(
+                      color: AppTheme.colorAccentGlow.withValues(alpha: 0.08),
+                      blurRadius: 24,
+                      spreadRadius: 0,
+                      offset: const Offset(0, 4),
+                    ),
+                  ],
                 ),
-                padding: const EdgeInsets.all(AppTheme.spacing16),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(16),
+                  child: BackdropFilter(
+                    filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+                    child: Padding(
+                      padding: const EdgeInsets.all(AppTheme.spacing16),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
                     Text('PATH', style: AppTextStyles.cardTitle),
                     const Gap(AppTheme.spacing12),
                     if (_pathLoading)
@@ -238,8 +269,11 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                   ],
                 ),
               ),
-            ],
+            ),
           ),
+        ),
+        ],
+      ),
         ),
       ),
     );

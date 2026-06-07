@@ -16,11 +16,11 @@ void main() {
       const ProviderScope(child: SwarmApp()),
     );
 
-    // pumpAndSettle drains flutter_animate timers (fadeIn/scaleXY 200 ms).
-    // Timeout > longest animation so it always completes.
-    await tester.pumpAndSettle(const Duration(seconds: 2));
+    // Wait for splash to finish (3 seconds + 500ms fade) without pumpAndSettle (infinite animations)
+    await tester.pump(const Duration(seconds: 4));
+    await tester.pump(const Duration(seconds: 1));
 
-    // AppBar title must be present.
+    // AppBar title must be present on VoiceDebugScreen
     expect(find.text('SWARM INTERFACE'), findsOneWidget);
   });
 }
