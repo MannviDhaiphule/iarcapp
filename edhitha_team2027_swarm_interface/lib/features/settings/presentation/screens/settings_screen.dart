@@ -23,6 +23,8 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
   final TextEditingController _portController = TextEditingController();
   final TextEditingController _mapUrlController = TextEditingController();
   final TextEditingController _pathUrlController = TextEditingController();
+  final TextEditingController _missionLengthController = TextEditingController();
+  String? _missionLengthError;
   bool _initialized = false;
 
   @override
@@ -32,6 +34,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     _portController.addListener(() => setState(() {}));
     _mapUrlController.addListener(() => setState(() {}));
     _pathUrlController.addListener(() => setState(() {}));
+    _missionLengthController.addListener(() => setState(() {}));
   }
 
   @override
@@ -40,6 +43,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     _portController.dispose();
     _mapUrlController.dispose();
     _pathUrlController.dispose();
+    _missionLengthController.dispose();
     super.dispose();
   }
 
@@ -56,10 +60,22 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
   void _saveServer() {
     final port = int.tryParse(_portController.text.trim());
     if (port == null) return;
+
+    final missionLenText = _missionLengthController.text.trim();
+    final missionLen = double.tryParse(missionLenText);
+    if (missionLen == null || missionLen <= 0) {
+      setState(() {
+        _missionLengthError = 'Must be a positive number';
+      });
+      return;
+    }
+    setState(() => _missionLengthError = null);
+
     ref
         .read(settingsProvider.notifier)
         .updateServerIp(_ipController.text.trim());
     ref.read(settingsProvider.notifier).updateServerPort(port);
+    ref.read(settingsProvider.notifier).updateMissionLength(missionLen);
 
     final ip = _ipController.text.trim();
     ScaffoldMessenger.of(context).showSnackBar(
@@ -73,6 +89,8 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     _portController.text = AppConstants.defaultServerPort.toString();
     _mapUrlController.text = AppConstants.defaultMapImageUrl;
     _pathUrlController.text = AppConstants.defaultPathTextUrl;
+    _missionLengthController.text = AppConstants.defaultMissionLength.toString();
+    setState(() => _missionLengthError = null);
   }
 
   void _saveMap() {
@@ -107,6 +125,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
         _portController.text = s.serverPort.toString();
         _mapUrlController.text = s.mapImageUrl;
         _pathUrlController.text = s.pathTextUrl;
+        _missionLengthController.text = s.missionLength.toString();
       }
     });
 
@@ -187,6 +206,35 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                         borderRadius: BorderRadius.circular(8),
                         borderSide: const BorderSide(color: AppTheme.colorAccent),
                       ),
+                    ),
+                  ),
+                  const Gap(AppTheme.spacing12),
+                  _buildLabel('Mission Length (param1)'),
+                  const Gap(AppTheme.spacing8),
+                  TextField(
+                    controller: _missionLengthController,
+                    keyboardType: const TextInputType.numberWithOptions(
+                      decimal: true,
+                    ),
+                    style: AppTextStyles.transcriptBody,
+                    decoration: InputDecoration(
+                      hintText: AppConstants.defaultMissionLength.toString(),
+                      filled: true,
+                      fillColor: AppTheme.colorSurfaceElevated,
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(8),
+                        borderSide: const BorderSide(color: AppTheme.colorBorder),
+                      ),
+                      enabledBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(8),
+                        borderSide: const BorderSide(color: AppTheme.colorBorder),
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(8),
+                        borderSide: const BorderSide(color: AppTheme.colorAccent),
+                      ),
+                      errorText: _missionLengthError,
+                      errorStyle: const TextStyle(color: AppTheme.colorError),
                     ),
                   ),
                   const Gap(AppTheme.spacing16),

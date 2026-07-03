@@ -124,8 +124,9 @@ class DispatchNotifier extends StateNotifier<DispatchState> {
       await _ref.read(settingsProvider.future);
     }
     final serverUrl = _ref.read(settingsProvider).requireValue.serverUrl;
+    final missionLength = _ref.read(settingsProvider).requireValue.missionParam1;
     debugPrint('[SwarmApp] Dispatching to: $serverUrl');
-    final dispatcher = CommandDispatcher(serverUrl: serverUrl);
+    final dispatcher = CommandDispatcher(serverUrl: serverUrl, missionLength: missionLength);
 
     state = DispatchState(
       lastDispatched: state.lastDispatched,

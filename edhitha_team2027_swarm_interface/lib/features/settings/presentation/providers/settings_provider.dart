@@ -24,6 +24,7 @@ class SettingsState {
     required this.serverPort,
     this.mapImageUrl = AppConstants.defaultMapImageUrl,
     this.pathTextUrl = AppConstants.defaultPathTextUrl,
+    this.missionLength = AppConstants.defaultMissionLength,
     this.isSaving = false,
     this.savedSuccess = false,
     this.error,
@@ -41,6 +42,9 @@ class SettingsState {
   /// The configured path text URL.
   final String pathTextUrl;
 
+  /// Mission length in seconds — used as param1 in START_SEARCH payload.
+  final double missionLength;
+
   /// Whether a save operation is currently in progress.
   final bool isSaving;
 
@@ -53,12 +57,16 @@ class SettingsState {
   /// Full base URL derived from [serverIp] and [serverPort].
   String get serverUrl => 'http://$serverIp:$serverPort';
 
+  /// param1 value to include in the START_SEARCH HTTP payload.
+  double get missionParam1 => missionLength;
+
   /// Returns a copy with the given fields overridden.
   SettingsState copyWith({
     String? serverIp,
     int? serverPort,
     String? mapImageUrl,
     String? pathTextUrl,
+    double? missionLength,
     bool? isSaving,
     bool? savedSuccess,
     Object? error = _unset,
@@ -68,6 +76,7 @@ class SettingsState {
       serverPort: serverPort ?? this.serverPort,
       mapImageUrl: mapImageUrl ?? this.mapImageUrl,
       pathTextUrl: pathTextUrl ?? this.pathTextUrl,
+      missionLength: missionLength ?? this.missionLength,
       isSaving: isSaving ?? this.isSaving,
       savedSuccess: savedSuccess ?? this.savedSuccess,
       error: identical(error, _unset) ? this.error : error as String?,
@@ -87,11 +96,13 @@ class Settings extends _$Settings {
     final port = await _repo.getServerPort();
     final mapUrl = await _repo.getMapImageUrl();
     final pathUrl = await _repo.getPathTextUrl();
+    final missionLen = await _repo.getMissionLength();
     return SettingsState(
       serverIp: ip,
       serverPort: port,
       mapImageUrl: mapUrl,
       pathTextUrl: pathUrl,
+      missionLength: missionLen,
     );
   }
 
@@ -182,18 +193,40 @@ class Settings extends _$Settings {
     _scheduleSavedReset();
   }
 
+  /// Validates and saves mission length. Must be a positive decimal number.
+  Future<void> updateMissionLength(double value) async {
+    final current = _current();
+    if (value <= 0) {
+      state = AsyncData(current.copyWith(error: 'Mission length must be greater than 0'));
+      return;
+    }
+    state = AsyncData(current.copyWith(isSaving: true, error: null));
+    await _repo.setMissionLength(value);
+    state = AsyncData(
+      current.copyWith(
+        missionLength: value,
+        isSaving: false,
+        savedSuccess: true,
+        error: null,
+      ),
+    );
+    _scheduleSavedReset();
+  }
+
   /// Resets all values to [AppConstants] defaults and persists.
   Future<void> resetToDefaults() async {
     await _repo.setServerIp(AppConstants.defaultServerIp);
     await _repo.setServerPort(AppConstants.defaultServerPort);
     await _repo.setMapImageUrl(AppConstants.defaultMapImageUrl);
     await _repo.setPathTextUrl(AppConstants.defaultPathTextUrl);
+    await _repo.setMissionLength(AppConstants.defaultMissionLength);
     state = const AsyncData(
       SettingsState(
         serverIp: AppConstants.defaultServerIp,
         serverPort: AppConstants.defaultServerPort,
         mapImageUrl: AppConstants.defaultMapImageUrl,
         pathTextUrl: AppConstants.defaultPathTextUrl,
+        missionLength: AppConstants.defaultMissionLength,
         savedSuccess: true,
       ),
     );
@@ -205,6 +238,7 @@ class Settings extends _$Settings {
       const SettingsState(
         serverIp: AppConstants.defaultServerIp,
         serverPort: AppConstants.defaultServerPort,
+        missionLength: AppConstants.defaultMissionLength,
       );
 
   void _scheduleSavedReset() {

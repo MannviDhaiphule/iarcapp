@@ -41,7 +41,7 @@ extension CommandIdLabel on CommandId {
       case CommandId.cmdHover:
         return 'CMD_HOVER';
       case CommandId.cmdOrbit:
-        return 'CMD_ORBIT';
+        return 'START_ORBIT';
       case CommandId.cmdLand:
         return 'CMD_LAND';
       case CommandId.cmdDirN:
@@ -53,7 +53,7 @@ extension CommandIdLabel on CommandId {
       case CommandId.cmdHalt:
         return 'CMD_HALT';
       case CommandId.cmdMission:
-        return 'CMD_MISSION';
+        return 'START_SEARCH';
       case CommandId.unknown:
         return 'UNKNOWN';
     }

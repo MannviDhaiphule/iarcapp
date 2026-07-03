@@ -73,4 +73,21 @@ class SettingsRepository {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString(_keyPathTextUrl, url);
   }
+
+  static const String _keyMissionLength = 'mission_length';
+
+  /// Returns saved mission length or [AppConstants.defaultMissionLength].
+  Future<double> getMissionLength() async {
+    final prefs = await SharedPreferences.getInstance();
+    debugPrint('[SwarmApp] Loaded mission length: ${prefs.getDouble(_keyMissionLength) ?? AppConstants.defaultMissionLength}');
+    return prefs.getDouble(_keyMissionLength) ?? AppConstants.defaultMissionLength;
+  }
+
+  /// Saves the mission length.
+  Future<void> setMissionLength(double value) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setDouble(_keyMissionLength, value);
+    debugPrint('[SwarmApp] Saved mission length: $value');
+    debugPrint('[SwarmApp] Verified mission length: ${prefs.getDouble(_keyMissionLength)}');
+  }
 }

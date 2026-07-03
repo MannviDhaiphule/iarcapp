@@ -9,7 +9,10 @@ void main() {
     late CommandDispatcher dispatcher;
 
     setUp(() {
-      dispatcher = CommandDispatcher(serverUrl: 'http://localhost');
+      dispatcher = CommandDispatcher(
+        serverUrl: 'http://localhost',
+        missionLength: 0.0,
+      );
     });
 
     /// Verifies all four payload fields match expectations for [id].
@@ -45,8 +48,8 @@ void main() {
       expectPayload(CommandId.cmdHover, 'CMD_HOVER');
     });
 
-    test('cmdOrbit produces CMD_ORBIT', () {
-      expectPayload(CommandId.cmdOrbit, 'CMD_ORBIT');
+    test('cmdOrbit produces START_ORBIT', () {
+      expectPayload(CommandId.cmdOrbit, 'START_ORBIT');
     });
 
     test('cmdLand produces CMD_LAND', () {
@@ -73,6 +76,37 @@ void main() {
         );
       }
     });
+
+    test('cmdMission with missionLength 300.0 produces param1 300.0', () {
+      final d = CommandDispatcher(
+        serverUrl: 'http://test',
+        missionLength: 300.0,
+      );
+      final payload = d.buildPayload(CommandId.cmdMission);
+      expect(payload['command'], equals('START_SEARCH'));
+      expect(payload['drone_id'], equals(255));
+      expect(payload['param1'], equals(300.0));
+      expect(payload['param2'], equals(0.0));
+    });
+
+    test('cmdMission with missionLength 500.0 produces param1 500.0', () {
+      final d = CommandDispatcher(
+        serverUrl: 'http://test',
+        missionLength: 500.0,
+      );
+      final payload = d.buildPayload(CommandId.cmdMission);
+      expect(payload['param1'], equals(500.0));
+    });
+
+    test('non-mission command with missionLength 500.0 still sends param1 0.0',
+        () {
+      final d = CommandDispatcher(
+        serverUrl: 'http://test',
+        missionLength: 500.0,
+      );
+      final payload = d.buildPayload(CommandId.cmdLaunch);
+      expect(payload['param1'], equals(0.0));
+    });
   });
 
   group('CommandDispatcher — custom serverUrl', () {
@@ -85,6 +119,7 @@ void main() {
 
       final dispatcher = CommandDispatcher(
         serverUrl: 'http://10.0.0.1:9090',
+        missionLength: 300.0,
         client: mockClient,
       );
 

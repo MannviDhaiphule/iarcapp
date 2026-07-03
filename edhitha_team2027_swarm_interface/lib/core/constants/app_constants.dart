@@ -17,4 +17,7 @@ class AppConstants {
 
   /// Default URL for the path text endpoint.
   static const String defaultPathTextUrl = 'http://192.168.50.1:8080/path';
+
+  /// Default mission length (seconds) sent as param1 in START_SEARCH payload.
+  static const double defaultMissionLength = 300.0;
 }

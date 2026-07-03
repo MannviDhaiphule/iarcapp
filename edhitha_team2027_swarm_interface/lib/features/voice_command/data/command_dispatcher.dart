@@ -11,11 +11,17 @@ class CommandDispatcher {
   /// Creates a [CommandDispatcher] targeting [serverUrl].
   ///
   /// Supply an optional [client] for dependency injection in tests.
-  CommandDispatcher({required String serverUrl, http.Client? client})
-      : _serverUrl = serverUrl,
+  /// Supply [missionLength] to override param1 for START_SEARCH (default 300.0).
+  CommandDispatcher({
+    required String serverUrl,
+    double missionLength = 300.0,
+    http.Client? client,
+  })  : _serverUrl = serverUrl,
+        _missionLength = missionLength,
         _client = client ?? http.Client();
 
   final String _serverUrl;
+  final double _missionLength;
   final http.Client _client;
 
   /// POSTs [command] to `<serverUrl>/cmd`.
@@ -42,12 +48,13 @@ class CommandDispatcher {
 
   /// Builds the JSON payload map for [command].
   ///
-  /// Always uses `drone_id` 255 (broadcast) with zero `param1`/`param2`.
+  /// Uses [_missionLength] as param1 when command is [CommandId.cmdMission];
+  /// all other commands send param1: 0.0.
   Map<String, dynamic> buildPayload(CommandId command) {
     return {
       'command': command.label,
       'drone_id': 255,
-      'param1': 0.0,
+      'param1': command == CommandId.cmdMission ? _missionLength : 0.0,
       'param2': 0.0,
     };
   }

@@ -63,7 +63,11 @@ class _MapScreenState extends ConsumerState<MapScreen> {
     final url = ref.read(settingsProvider).valueOrNull?.mapImageUrl ?? '';
     if (url.isEmpty) return;
     try {
-      final response = await http.get(Uri.parse(url));
+      final response = await http
+          .get(Uri.parse(url))
+          .timeout(const Duration(seconds: 10));
+      debugPrint('[SwarmApp] Map fetch status: ${response.statusCode}');
+      debugPrint('[SwarmApp] Map fetch bytes: ${response.bodyBytes.length}');
       if (!mounted) return;
       if (response.statusCode == 200) {
         setState(() {
@@ -80,6 +84,7 @@ class _MapScreenState extends ConsumerState<MapScreen> {
       }
     } catch (e) {
       if (!mounted) return;
+      debugPrint('[SwarmApp] Map fetch error: $e');
       setState(() {
         _mapError = 'Could not load map';
         _mapLoading = false;
@@ -195,13 +200,56 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                         ),
                       )
                     else if (_mapBytes != null)
-                      ClipRRect(
-                        borderRadius: BorderRadius.circular(8),
-                        child: Image.memory(
-                          _mapBytes!,
-                          width: double.infinity,
-                          fit: BoxFit.contain,
-                        ),
+                      Builder(
+                        builder: (context) {
+                          try {
+                            return ClipRRect(
+                              borderRadius: BorderRadius.circular(8),
+                              child: Image.memory(
+                                _mapBytes!,
+                                width: double.infinity,
+                                fit: BoxFit.contain,
+                                errorBuilder: (context, error, stackTrace) {
+                                  debugPrint('[SwarmApp] Map decode error: $error');
+                                  return Column(
+                                    children: [
+                                      const Icon(
+                                        Icons.broken_image,
+                                        size: 48,
+                                        color: AppTheme.colorError,
+                                      ),
+                                      const Gap(AppTheme.spacing8),
+                                      Text(
+                                        'Image decode failed',
+                                        style: AppTextStyles.transcriptBody.copyWith(
+                                          color: AppTheme.colorError,
+                                        ),
+                                      ),
+                                    ],
+                                  );
+                                },
+                              ),
+                            );
+                          } catch (e) {
+                            debugPrint('[SwarmApp] Map decode error: $e');
+                            return Column(
+                              children: [
+                                const Icon(
+                                  Icons.broken_image,
+                                  size: 48,
+                                  color: AppTheme.colorError,
+                                ),
+                                const Gap(AppTheme.spacing8),
+                                Text(
+                                  'Image decode failed',
+                                  style: AppTextStyles.transcriptBody.copyWith(
+                                    color: AppTheme.colorError,
+                                  ),
+                                ),
+                              ],
+                            );
+                          }
+                        },
                       ),
                     const Gap(AppTheme.spacing8),
                     Text(
