@@ -25,6 +25,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
   final TextEditingController _mapUrlController = TextEditingController();
   final TextEditingController _pathUrlController = TextEditingController();
   final TextEditingController _missionLengthController = TextEditingController();
+  final TextEditingController _headingController = TextEditingController();
   String? _missionLengthError;
   bool _initialized = false;
 
@@ -36,6 +37,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     _mapUrlController.addListener(() => setState(() {}));
     _pathUrlController.addListener(() => setState(() {}));
     _missionLengthController.addListener(() => setState(() {}));
+    _headingController.addListener(() => setState(() {}));
   }
 
   @override
@@ -45,6 +47,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     _mapUrlController.dispose();
     _pathUrlController.dispose();
     _missionLengthController.dispose();
+    _headingController.dispose();
     super.dispose();
   }
 
@@ -72,11 +75,16 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     }
     setState(() => _missionLengthError = null);
 
+    final headingText = _headingController.text.trim();
+    final headingVal = double.tryParse(headingText);
+    if (headingVal == null) return;
+
     ref
         .read(settingsProvider.notifier)
         .updateServerIp(_ipController.text.trim());
     ref.read(settingsProvider.notifier).updateServerPort(port);
     ref.read(settingsProvider.notifier).updateMissionLength(missionLen);
+    ref.read(settingsProvider.notifier).updateHeading(headingVal);
 
     final ip = _ipController.text.trim();
     ScaffoldMessenger.of(context).showSnackBar(
@@ -91,6 +99,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     _mapUrlController.text = AppConstants.defaultMapImageUrl;
     _pathUrlController.text = AppConstants.defaultPathTextUrl;
     _missionLengthController.text = AppConstants.defaultMissionLength.toString();
+    _headingController.text = AppConstants.defaultHeading.toString();
     setState(() => _missionLengthError = null);
   }
 
@@ -127,6 +136,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
         _mapUrlController.text = s.mapImageUrl;
         _pathUrlController.text = s.pathTextUrl;
         _missionLengthController.text = s.missionLength.toString();
+        _headingController.text = s.heading.toString();
       }
     });
 
@@ -239,6 +249,34 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                           ),
                           errorText: _missionLengthError,
                           errorStyle: const TextStyle(color: AppTheme.colorError),
+                        ),
+                      ),
+                      const Gap(AppTheme.spacing12),
+                      _buildLabel('Heading (param2)'),
+                      const Gap(AppTheme.spacing8),
+                      TextField(
+                        controller: _headingController,
+                        keyboardType: const TextInputType.numberWithOptions(
+                          decimal: true,
+                          signed: true,
+                        ),
+                        style: AppTextStyles.transcriptBody,
+                        decoration: InputDecoration(
+                          hintText: AppConstants.defaultHeading.toString(),
+                          filled: true,
+                          fillColor: AppTheme.colorSurfaceElevated,
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(8),
+                            borderSide: const BorderSide(color: AppTheme.colorBorder),
+                          ),
+                          enabledBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(8),
+                            borderSide: const BorderSide(color: AppTheme.colorBorder),
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(8),
+                            borderSide: const BorderSide(color: AppTheme.colorAccent),
+                          ),
                         ),
                       ),
                       const Gap(AppTheme.spacing16),

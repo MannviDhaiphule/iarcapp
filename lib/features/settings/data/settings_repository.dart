@@ -90,4 +90,21 @@ class SettingsRepository {
     debugPrint('[SwarmApp] Saved mission length: $value');
     debugPrint('[SwarmApp] Verified mission length: ${prefs.getDouble(_keyMissionLength)}');
   }
+
+  static const String _keyHeading = 'heading';
+
+  /// Returns saved heading or [AppConstants.defaultHeading].
+  Future<double> getHeading() async {
+    final prefs = await SharedPreferences.getInstance();
+    debugPrint('[SwarmApp] Loaded heading: ${prefs.getDouble(_keyHeading) ?? AppConstants.defaultHeading}');
+    return prefs.getDouble(_keyHeading) ?? AppConstants.defaultHeading;
+  }
+
+  /// Saves the heading value.
+  Future<void> setHeading(double value) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setDouble(_keyHeading, value);
+    debugPrint('[SwarmApp] Saved heading: $value');
+    debugPrint('[SwarmApp] Verified heading: ${prefs.getDouble(_keyHeading)}');
+  }
 }

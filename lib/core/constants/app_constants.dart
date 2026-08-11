@@ -20,4 +20,7 @@ class AppConstants {
 
   /// Default mission length (seconds) sent as param1 in START_SEARCH payload.
   static const double defaultMissionLength = 300.0;
+
+  /// Default heading sent as param2 in START_SEARCH payload.
+  static const double defaultHeading = -1.0;
 }
